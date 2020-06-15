@@ -1,3 +1,4 @@
+import os, shutil
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
@@ -13,7 +14,7 @@ from .sudoku_solver import mySudokuSolver
 def index(request):
 #    return HttpResponse("<em>Hello World!</em>")
 
-
+    clear_media_folder()
     if  request.method == "POST":
         f = request.FILES['sentFile'] # here you get the files needed
         response = {}
@@ -22,11 +23,23 @@ def index(request):
         file_url = default_storage.url(file_name_2)
 
         numpy_image = cv.imread(file_url)
-        numbers = mySudokuSolver.solve_this(numpy_image)
+        print('This is the file_url ',file_url)
 
-        response['name'] = settings.BASE_DIR+'/'+file_url
-        default_storage.delete(file_name)
+        #numbers = mySudokuSolver.solve_this(numpy_image)
+        response['name'] = 'hello'
 
         return render(request,'homepage.html',response)
     else:
         return render(request,'homepage.html')
+
+def clear_media_folder():
+    folder = os.path.join(settings.BASE_DIR,'static','media')
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
