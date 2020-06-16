@@ -16,7 +16,7 @@ def index(request):
 
     clear_media_folder()
     if  request.method == "POST":
-        f = request.FILES['sentFile'] # here you get the files needed
+        f = request.FILES['chosenFile'] # here you get the files needed
         response = {}
         file_name = "pic.jpg"
         file_name_2 = default_storage.save(file_name, f)
@@ -25,8 +25,8 @@ def index(request):
         numpy_image = cv.imread(file_url)
         print('This is the file_url ',file_url)
 
-        #numbers = mySudokuSolver.solve_this(numpy_image)
-        response['name'] = 'hello'
+        numbers = mySudokuSolver.solve_this(numpy_image)
+        response['name'] = np.transpose(numbers)
 
         return render(request,'homepage.html',response)
     else:

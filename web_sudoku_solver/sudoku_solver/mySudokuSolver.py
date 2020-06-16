@@ -4,7 +4,7 @@ import numpy as np
 #import digit_predictor.Predictor as predictor
 #import solver_files.ASP_interface as ASP_interface
 from .digit_predictor import Predictor as predictor
-from .solver_files import ASP_interface 
+from .solver_files import ASP_interface
 
 def pad_and_resize(digit,imsize):
     (w,h) = digit.shape
@@ -33,17 +33,15 @@ def find_cell(x_array, y_array ,x,y):
 def test(img):
     return 'yes'
 
+def turn_image(img):
+    img=cv.transpose(img)
+    img=cv.flip(img,flipCode=1)
+    return img
+
+
 
 def solve_this(img):
     img = scaleImg(img)
-    cv.imshow('original', img)
-    key = cv.waitKey(0)
-    if key == 114:  # if either r or R are pressed
-        img=cv.transpose(img)
-        img=cv.flip(img,flipCode=1)
-        cv.imshow('original', img)
-        cv.waitKey(0)
-
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     gaus = cv.GaussianBlur(gray, (5,5), 0)
     thresh = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
