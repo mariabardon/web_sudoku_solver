@@ -23,9 +23,11 @@ def index(request):
         file_url = default_storage.url(file_name_2)
 
         numpy_image = cv.imread(file_url)
+
         print('This is the file_url ',file_url)
 
         numbers = mySudokuSolver.solve_this(numpy_image)
+        
         response['name'] = np.transpose(numbers)
 
         return render(request,'homepage.html',response)
