@@ -1,3 +1,3 @@
-$('#file').click(function(){
-  console.log("There was a click!");
-})
+document.getElementById('myImage').onchange = function() {
+  this.form.submit();
+};

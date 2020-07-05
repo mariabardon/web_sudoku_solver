@@ -46,8 +46,6 @@ def solve_this(img):
     gaus = cv.GaussianBlur(gray, (5,5), 0)
     thresh = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
     contours, _ = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
-    #cv.imshow('thresh', thresh)
-    #cv.waitKey(0)
     # get contour with largest area (which is sudoku grid outside border),
     # approximate as polygonal shape, and mask the image with the aproximated contour.
     largest_area = max([cv.contourArea(c) for c in contours])
