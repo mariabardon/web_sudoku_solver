@@ -148,14 +148,17 @@ def solve_this(img):
                 sudoku_numbers[i][j] = str(predicted[0])
                 asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,predicted[0]))
 
+    solution_matrix = np.empty((9,9)).astype(int)
+    solution_matrix[sudoku_numbers!=None] = sudoku_numbers[sudoku_numbers!=None]
+
     solution = ASP_interface.solve(asp_lines)
     for e in solution:
         #i and j go from 0 to 8, but answer goes from 1 to 9
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )
-        sudoku_numbers[i][j]=digit
+        solution_matrix[i][j]=digit
 
-    print(np.transpose(sudoku_numbers))
-    return sudoku_numbers
+    print(np.transpose(solution_matrix))
+    return solution_matrix, sudoku_numbers
 
 
 if __name__ == "__main__":

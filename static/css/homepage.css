@@ -1,6 +1,25 @@
-input[type="file"]{
-    color: transparent;
+/* body{
+  font-family: 'Montserrat';
+  color: #FDFFFC;
+  text-align: center;
+  background-color: #011627;
+  border: 60px solid #2EC4B6;
+  border-top: 0px;
+  margin: 0px;
+} */
+
+#chooseButton{
+  border-radius: 15px;
+  background: #FF9F1C;
+  height: 40px;
+  width: 175px;
+  font-family: "Montserrat";
+  font-size: 1.2em;
+  margin-bottom: 4px;
+
 }
+
+
 
 table {
   margin:1em auto;

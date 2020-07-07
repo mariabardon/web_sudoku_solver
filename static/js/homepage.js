@@ -1,3 +1,4 @@
-document.getElementById('myImage').onchange = function() {
-  this.form.submit();
+
+document.getElementById('fileName').onchange = function() {
+    this.form.submit();
 };
