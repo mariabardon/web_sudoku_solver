@@ -35,6 +35,11 @@
             <label id='chooseButton' for="fileName" class="btn" align='center'>Upload Your Image</label>
             <input id="fileName" name='fileName' style="visibility:hidden;" type="file">
           </div>
+        </form>
+          <!-- <div id="sudoku_image"></div> -->
+        {% if img_url %}
+        <div><img class="img-thumbnail img-fluid" src="{{img_url}}"></div>
+        {% endif %}
           <!-- </div> -->
           <div class='col-6 px-0'>
             <table>
@@ -49,9 +54,6 @@
               <tr><td> {{solution.8.0}} </td><td> {{solution.8.1}} </td><td> {{solution.8.2}} </td><td> {{solution.8.3}} </td><td> {{solution.8.4}} </td><td> {{solution.8.5}} </td><td> {{solution.8.6}} </td><td> {{solution.8.7}} </td><td> {{solution.8.8}} </td></tr>
             </table>
           </div>
-        </form>
-      </div>
-      <div class="" id='imageDisplay'>
       </div>
     </div>
 
@@ -70,6 +72,5 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="{% static 'js/homepage.js' %}?version=1"></script>
     <link rel="stylesheet" href= "{% static  'css/homepage.css' %}?version=1">
-
   </body>
 </html>

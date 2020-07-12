@@ -15,19 +15,19 @@ def index(request):
 #    return HttpResponse("<em>Hello World!</em>")
 
     clear_media_folder()
+
     if  request.method == "POST":
         f = request.FILES['fileName'] # here you get the files needed
         response = {}
         file_name = "pic.jpg"
         file_name_2 = default_storage.save(file_name, f)
         file_url = default_storage.url(file_name_2)
-
         numpy_image = cv.imread(file_url)
-
+        response['img_url'] =  file_url
         solution, original_numbers = mySudokuSolver.solve_this(numpy_image)
 
-        response['solution'] = np.transpose(solution)
-        response['guessed'] =  np.transpose(original_numbers)
+        # response['solution'] = np.transpose(solution)
+        #response['guessed'] =  np.transpose(original_numbers)
         return render(request,'homepage.html',response)
     else:
         return render(request,'homepage.html')
