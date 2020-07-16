@@ -22,6 +22,9 @@ def index(request):
         file_name = "pic.jpg"
         file_name_2 = default_storage.save(file_name, f)
         file_url = default_storage.url(file_name_2)
+
+        mySudokuSolver.get_img_rotation(file_url)
+
         numpy_image = cv.imread(file_url)
         response['img_url'] =  file_url
         solution, original_numbers = mySudokuSolver.solve_this(numpy_image)
