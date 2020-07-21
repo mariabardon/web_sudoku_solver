@@ -1,7 +1,5 @@
 import cv2 as cv
 import numpy as np
-import exifread
-import io
 import re
 #import digit_predictor.Predictor as predictor
 #import solver_files.ASP_interface as ASP_interface
@@ -39,23 +37,6 @@ def turn_image(img):
     img=cv.transpose(img)
     img=cv.flip(img,flipCode=1)
     return img
-
-def get_img_rotation(file):
-    f = open(file, 'rb')
-    tags = exifread.process_file(f)
-    orientation_string = tags['Image Orientation'].printable
-    rotation = int(re.findall('\d+', orientation_string )[0])
-    return(rotation)
-    # for tag in tags.keys():
-    #     if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
-    #         print("Key: %s, value %s" % (tag, tags[tag]))
-
-
-    #imWithEXIF = Image.open(file)
-    #print(imWithEXIF.info['exif'])
-    #img = cv.imread(file,cv.IMREAD_UNCHANGED)
-    #cv.imshow('orientation unchanged', img)
-    #cv.waitKey(0)
 
 def solve_this(img):
     img = scaleImg(img)

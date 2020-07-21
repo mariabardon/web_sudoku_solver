@@ -8,22 +8,28 @@ import numpy as np
 import cv2 as cv
 from django.http import HttpResponse
 from .sudoku_solver import mySudokuSolver
-#from . import mySudokuSolver
-# Create your views here.
+import exifread
+import io
+import re
+
 
 def index(request):
-#    return HttpResponse("<em>Hello World!</em>")
 
     clear_media_folder()
 
     if  request.method == "POST":
-        f = request.FILES['fileName'] # here you get the files needed
         response = {}
+        f = request.FILES['fileName'] # here you get the files needed
+        # https://github.com/ianare/exif-py/blob/develop/exifread/classes.py
+        tags = exifread.process_file(f,stop_tag='Image Orientation',details=False)
+        orientation_value = tags.get('Image Orientation').values[0]
+        response['transform'] = getTransform(orientation_value)
+        # orientation = int(re.findall('\d+', orientation_string )[0])
+
+
         file_name = "pic.jpg"
         file_name_2 = default_storage.save(file_name, f)
         file_url = default_storage.url(file_name_2)
-
-        mySudokuSolver.get_img_rotation(file_url)
 
         numpy_image = cv.imread(file_url)
         response['img_url'] =  file_url
@@ -46,3 +52,16 @@ def clear_media_folder():
                 shutil.rmtree(file_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+# https://exiftool.org/TagNames/EXIF.html
+def getTransform(orientation_value):
+    print(orientation_value)
+    transform_dictionary = {1:'',\
+                            2:'scaleX(-1)',\
+                            3:'rotate(180deg)',\
+                            4:'scaleY(-1)',\
+                            5:'scaleY(-1) rotate(270deg)',\
+                            6:'rotate(90deg)',\
+                            7:'rotate(270deg)',\
+                            8:'scaleY(-1) rotate(90deg)'}
+    return transform_dictionary[orientation_value]
