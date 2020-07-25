@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 {% load static %}
+
+
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
     <title>Sudoku Solver</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -23,23 +26,44 @@
         </ul>
       </div>
     </nav>
+
     <div class="container" align='center' style="max-width: 650px; margin: auto;">
       <h1 class="display-4">My Sudoku Solver</h1>
       <p class="lead">Upload an image of an empty sudoku and I will solve it for you</p>
       <div class="container" align='center'>
         <form method="post" class="md-form" enctype="multipart/form-data">
           {% csrf_token %}
-          <!-- <div class="btn btn-mdb-color btn-rounded float-center"> -->
-            <!-- <input type="file"  id="fileName" name="fileName" /> -->
           <div>
             <label id='chooseButton' for="fileName" class="btn" align='center'>Upload Your Image</label>
             <input id="fileName" name='fileName' style="visibility:hidden;" type="file">
           </div>
         </form>
-          <!-- <div id="sudoku_image"></div> -->
+
         {% if img_url %}
-        <p> hello </p>
-        <img id = 'sudoku_image' style="width:20px;height:40px;object-fit:scale-down;" class="img-thumbnail img-fluid"  src="{{img_url}}" style="transform:{{transform}}">
+        <!-- https://css-tricks.com/aspect-ratio-boxes/ -->
+        <div class="container" align='center' style = "--aspect-ratio:{{width}}/{{height}}">
+            <img src="{{img_url}}" class="w3-border" style= "transform:{{transform}}; padding:4px;width:50%;" >
+        </div>
+
+
+
+
+
+        {% endif %}
+        {% if solution %}
+        <div class='col-6 px-0'>
+          <table>
+            <tr><td> {{solution.0.0}} </td><td> {{solution.0.1}} </td><td> {{solution.0.2}} </td><td> {{solution.0.3}} </td><td> {{solution.0.4}} </td><td> {{solution.0.5}} </td><td> {{solution.0.6}} </td><td> {{solution.0.7}} </td><td> {{solution.0.8}} </td></tr>
+            <tr><td> {{solution.1.0}} </td><td> {{solution.1.1}} </td><td> {{solution.1.2}} </td><td> {{solution.1.3}} </td><td> {{solution.1.4}} </td><td> {{solution.1.5}} </td><td> {{solution.1.6}} </td><td> {{solution.1.7}} </td><td> {{solution.1.8}} </td></tr>
+            <tr><td> {{solution.2.0}} </td><td> {{solution.2.1}} </td><td> {{solution.2.2}} </td><td> {{solution.2.3}} </td><td> {{solution.2.4}} </td><td> {{solution.2.5}} </td><td> {{solution.2.6}} </td><td> {{solution.2.7}} </td><td> {{solution.2.8}} </td></tr>
+            <tr><td> {{solution.3.0}} </td><td> {{solution.3.1}} </td><td> {{solution.3.2}} </td><td> {{solution.3.3}} </td><td> {{solution.3.4}} </td><td> {{solution.3.5}} </td><td> {{solution.3.6}} </td><td> {{solution.3.7}} </td><td> {{solution.3.8}} </td></tr>
+            <tr><td> {{solution.4.0}} </td><td> {{solution.4.1}} </td><td> {{solution.4.2}} </td><td> {{solution.4.3}} </td><td> {{solution.4.4}} </td><td> {{solution.4.5}} </td><td> {{solution.4.6}} </td><td> {{solution.4.7}} </td><td> {{solution.4.8}} </td></tr>
+            <tr><td> {{solution.5.0}} </td><td> {{solution.5.1}} </td><td> {{solution.5.2}} </td><td> {{solution.5.3}} </td><td> {{solution.5.4}} </td><td> {{solution.5.5}} </td><td> {{solution.5.6}} </td><td> {{solution.5.7}} </td><td> {{solution.5.8}} </td></tr>
+            <tr><td> {{solution.6.0}} </td><td> {{solution.6.1}} </td><td> {{solution.6.2}} </td><td> {{solution.6.3}} </td><td> {{solution.6.4}} </td><td> {{solution.6.5}} </td><td> {{solution.6.6}} </td><td> {{solution.6.7}} </td><td> {{solution.6.8}} </td></tr>
+            <tr><td> {{solution.7.0}} </td><td> {{solution.7.1}} </td><td> {{solution.7.2}} </td><td> {{solution.7.3}} </td><td> {{solution.7.4}} </td><td> {{solution.7.5}} </td><td> {{solution.7.6}} </td><td> {{solution.7.7}} </td><td> {{solution.7.8}} </td></tr>
+            <tr><td> {{solution.8.0}} </td><td> {{solution.8.1}} </td><td> {{solution.8.2}} </td><td> {{solution.8.3}} </td><td> {{solution.8.4}} </td><td> {{solution.8.5}} </td><td> {{solution.8.6}} </td><td> {{solution.8.7}} </td><td> {{solution.8.8}} </td></tr>
+          </table>
+        </div>
         {% endif %}
           <!-- </div> -->
         {% if solution %}
@@ -69,7 +93,6 @@
 
 
     <!-- Need to have JQuery and Javascript for DropDown Actions to work -->
-    <!-- <script src="https://unpkg.com/exif-js@2.2.1"></script> -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script

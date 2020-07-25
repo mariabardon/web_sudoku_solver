@@ -21,12 +21,10 @@ def index(request):
         response = {}
         f = request.FILES['fileName'] # here you get the files needed
         # https://github.com/ianare/exif-py/blob/develop/exifread/classes.py
-        tags = exifread.process_file(f,stop_tag='Image Orientation',details=False)
-        orientation_value = tags.get('Image Orientation').values[0]
-        response['transform'] = getTransform(orientation_value)
-        # orientation = int(re.findall('\d+', orientation_string )[0])
-
-
+        transform, width, height = getTransformAndAspect(f)
+        response['transform'] = transform
+        response['width'] = width
+        response['height'] = height
         file_name = "pic.jpg"
         file_name_2 = default_storage.save(file_name, f)
         file_url = default_storage.url(file_name_2)
@@ -54,8 +52,9 @@ def clear_media_folder():
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 # https://exiftool.org/TagNames/EXIF.html
-def getTransform(orientation_value):
-    print(orientation_value)
+def getTransformAndAspect(f):
+    tags = exifread.process_file(f)
+    orientation_value = tags.get('Image Orientation').values[0]
     transform_dictionary = {1:'',\
                             2:'scaleX(-1)',\
                             3:'rotate(180deg)',\
@@ -63,5 +62,14 @@ def getTransform(orientation_value):
                             5:'scaleY(-1) rotate(270deg)',\
                             6:'rotate(90deg)',\
                             7:'rotate(270deg)',\
-                            8:'scaleY(-1) rotate(90deg)'}
-    return transform_dictionary[orientation_value]
+                            8:'scaleY(-1) rotate(90deg) '}
+
+    transform = transform_dictionary[orientation_value]
+    width, height = 0, 0
+    if orientation_value in [1,2,3,4,7,8]:
+        height = tags.get('EXIF ExifImageLength').values[0]
+        width = tags.get('EXIF ExifImageWidth').values[0]
+    elif orientation_value in [5,6]:
+        width = tags.get('EXIF ExifImageLength').values[0]
+        height = tags.get('EXIF ExifImageWidth').values[0]
+    return transform, width, height
