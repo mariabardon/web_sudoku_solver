@@ -8,25 +8,38 @@
   margin: 0px;
 } */
 
-#chooseButton{
+.btn{
   border-radius: 15px;
-  background: #FF9F1C;
   height: 40px;
   width: 175px;
   font-family: "Montserrat";
   font-size: 1.2em;
   margin-bottom: 4px;
-
 }
+
+#chooseButton{
+  background: #FF9F1C;
+}
+
+#solveButton{
+  background: #41a5cc;
+}
+
 
 table {
-  margin:1em auto;
+  /* margin:1em auto; */
+  padding:4px;
+  width:100%;
+  ratio: 1;
 }
 td {
-  height:30px;
-  width:30px;
+  /* height:30px; */
+  /* width:30px; */
+  height:11%;
+  width :4%;
   border:1px solid;
   text-align:center;
+  font-size: 3vw;
 }
 td:first-child {
   border-left:solid;
@@ -40,27 +53,14 @@ tr:first-child {
 tr:nth-child(3n) td {
   border-bottom:solid ;
 }
-
-
-[style*="--aspect-ratio"] > :first-child {
-  width: 100%;
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
 }
-[style*="--aspect-ratio"] > img {
-  height: auto;
-}
-@supports (--custom:property) {
-  [style*="--aspect-ratio"] {
-    position: relative;
-  }
-  [style*="--aspect-ratio"]::before {
-    content: "";
-    display: block;
-    padding-bottom: calc(100% / (var(--aspect-ratio)));
-  }
-  [style*="--aspect-ratio"] > :first-child {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-  }
+/* Clear floats after image containers */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
 }

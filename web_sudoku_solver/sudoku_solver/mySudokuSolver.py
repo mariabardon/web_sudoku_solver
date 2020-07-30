@@ -38,7 +38,7 @@ def turn_image(img):
     img=cv.flip(img,flipCode=1)
     return img
 
-def solve_this(img):
+def scan_image(img):
     img = scaleImg(img)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     gaus = cv.GaussianBlur(gray, (5,5), 0)
@@ -129,7 +129,7 @@ def solve_this(img):
     imsize = predictor.getIMSIZE()
 
     sudoku_numbers = np.empty((9,9)).astype(int)
-    asp_lines = []
+    # asp_lines = []
     for cnt in contours:
         area = cv.contourArea(cnt)
         if max_area > area and area > min_area:
@@ -144,8 +144,17 @@ def solve_this(img):
                 #cv.waitKey(0)
                 i,j = find_cell(rows, columns ,x,y)
                 sudoku_numbers[i][j] = str(predicted[0])
-                asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,predicted[0]))
+                # asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,predicted[0]))
+    return sudoku_numbers
 
+def solve_sudoku(sudoku_numbers):
+    asp_lines = []
+    for i in range(9):
+        for j in range(9):
+            num = sudoku_numbers[i][j]
+            if num != 0:
+                asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,int(sudoku_numbers[i][j])))
+    print(asp_lines)
     solution_matrix = np.empty((9,9)).astype(int)
     solution_matrix[sudoku_numbers!=None] = sudoku_numbers[sudoku_numbers!=None]
 
