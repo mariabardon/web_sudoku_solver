@@ -81,7 +81,7 @@ soupsieve==2.0.1
 sqlparse==0.3.1
 terminado==0.8.2
 testpath==0.4.2
-toolz==0.10.0
+#toolz==0.10.0
 torch==1.6.0.dev20200515
 torchvision==0.7.0.dev20200515
 tornado==6.0.3
