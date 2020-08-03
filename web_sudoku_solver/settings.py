@@ -1,5 +1,7 @@
 import os
 import numpy as np
+import django_heroku
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -120,3 +122,4 @@ TEMPLATES = [
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
+django_heroku.settings(locals())
