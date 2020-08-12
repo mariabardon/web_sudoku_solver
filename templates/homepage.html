@@ -30,7 +30,6 @@
     <div class="container" align='center' style="max-width: 650px; margin: auto;">
       <h1 class="display-4">My Sudoku Solver</h1>
       <p class="lead">Upload an image of an empty sudoku and I will solve it for you</p>
-      <div class="container" align='center'>
         <form method="post" class="md-form" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -45,35 +44,35 @@
             </div> -->
           </div>
         </form>
+        <div class="container" align='center'>
+          <div class="row">
+            <div class='column' >
+              {% if img_url %}
+              <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;" >
+            {% endif %}
+            </div>
 
-        <div class="row">
-          <div class='column' >
-            {% if img_url %}
-            <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;" >
-          {% endif %}
-          </div>
 
-
-          <div class='column'>
+            <div class='column'>
             {% if original_numbers.0.0.0 %}
-            <table>
-              {% for original_numbers_row in original_numbers %}
-              <tr>
-                  {% for s in original_numbers_row %}
-                  <td>
-                    {% if s.1 == 0 %} <font style="color: red;" class='solved'>
-                    {% else %} <font style="color: black;">
-                    {% endif %}
-                    {{s.0}}
-                  </font>
-                  </td>
-                  {% endfor %}
-              </tr>
-              {% endfor %}
-            </table>
+              <table >
+                {% for original_numbers_row in original_numbers %}
+                <tr>
+                    {% for s in original_numbers_row %}
+                    <td>
+                      {% if s.1 == 0 %} <font style="color: red;" class='solved'>
+                      {% else %} <font style="color: black;">
+                      {% endif %}
+                      {{s.0}}
+                    </font>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
           </div>
-        </div>
-        {% endif %}
+          {% endif %}
       </div>
     </div>
 

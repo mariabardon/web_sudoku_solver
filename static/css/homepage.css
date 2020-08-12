@@ -27,19 +27,13 @@
 
 
 table {
-  /* margin:1em auto; */
-  padding:4px;
   width:100%;
-  ratio: 1;
+  border-collapse: collapse;
 }
 td {
-  /* height:30px; */
-  /* width:30px; */
-  height:11%;
-  width :4%;
   border:1px solid;
   text-align:center;
-  font-size: 3vw;
+  /* font-size: 2vw; */
 }
 td:first-child {
   border-left:solid;
