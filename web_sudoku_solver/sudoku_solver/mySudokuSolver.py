@@ -43,7 +43,7 @@ def scan_image(img):
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     gaus = cv.GaussianBlur(gray, (5,5), 0)
     thresh = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
-    contours, _ = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
+    contours, _ = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[-2:]
     # get contour with largest area (which is sudoku grid outside border),
     # approximate as polygonal shape, and mask the image with the aproximated contour.
     largest_area = max([cv.contourArea(c) for c in contours])
@@ -114,7 +114,7 @@ def scan_image(img):
     gray = cv.cvtColor(new_sudoku_masked, cv.COLOR_BGR2GRAY)
     gaus = cv.GaussianBlur(gray, (5,5), 0).astype('uint8')
     thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
-    contours, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
     #cv.imshow('new_threshold', thresh2)
     #cv.waitKey(0)
 
@@ -128,7 +128,7 @@ def scan_image(img):
     predictor.load_model()
     imsize = predictor.getIMSIZE()
 
-    sudoku_numbers = np.empty((9,9)).astype(int)
+    sudoku_numbers = np.zeros((9,9), dtype=int)
     # asp_lines = []
     for cnt in contours:
         area = cv.contourArea(cnt)
@@ -144,10 +144,12 @@ def scan_image(img):
                 #cv.waitKey(0)
                 i,j = find_cell(rows, columns ,x,y)
                 sudoku_numbers[i][j] = str(predicted[0])
+                print(predicted[0],'at:',i,j)
                 # asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,predicted[0]))
     return sudoku_numbers
 
 def solve_sudoku(sudoku_numbers):
+    print(sudoku_numbers)
     asp_lines = []
     for i in range(9):
         for j in range(9):
@@ -155,8 +157,8 @@ def solve_sudoku(sudoku_numbers):
             if num != 0:
                 asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,int(sudoku_numbers[i][j])))
     print(asp_lines)
-    solution_matrix = np.empty((9,9)).astype(int)
-    solution_matrix[sudoku_numbers!=None] = sudoku_numbers[sudoku_numbers!=None]
+    solution_matrix = np.zeros((9,9), dtype=int)
+    solution_matrix[sudoku_numbers!=0] = sudoku_numbers[sudoku_numbers!=0]
 
     solution = ASP_interface.solve(asp_lines)
     for e in solution:
