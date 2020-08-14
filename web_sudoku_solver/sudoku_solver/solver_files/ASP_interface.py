@@ -9,7 +9,6 @@ clingoPath = os.path.join(solverDir,"clingo")
 sparcPath = os.path.join(solverDir,"sparc.jar")
 outputPath = os.path.join(solverDir,'output.txt')
 def solve(aspLines):
-    print('working directory ', os.getcwd())
     aspLines = aspLines + ['%%%%%%%%%%%%', 'display', '%%%%%%%%%%%%', 'value.']
     f=open(os.path.join(solverDir,"sudokuSolver_sample.sp"), "r+")
     content = f.read()
@@ -24,8 +23,10 @@ def solve(aspLines):
     os.chmod(sparcPath, st.st_mode | stat.S_IEXEC)
 
 
-    os.popen(' '.join(['java','-jar', sparcPath, mySolverPath, '-A >', outputPath]))
-    answerSet = open(outputPath, 'r').read()
+    # os.popen(' '.join(['java','-jar', sparcPath, mySolverPath, '-A >', outputPath]))
+    pipe = subprocess.Popen(['java','-jar', sparcPath, mySolverPath, '-A'], stdout=subprocess.PIPE)
+    answerSet = pipe.stdout.read().decode('utf-8')
+    sys.stdout.write('answerSet')
     sys.stdout.write(answerSet)
     chosenAnswer = answerSet.strip().split('\n\n')[0]
     entries = chosenAnswer.strip('{}').split(', ')

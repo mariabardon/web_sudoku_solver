@@ -162,7 +162,7 @@ def solve_sudoku(sudoku_numbers):
 
     solution = ASP_interface.solve(asp_lines)
     for e in solution:
-        sys.stdout.write('solution '+e)
+        sys.stdout.write('\nsolution '+e)
         #i and j go from 0 to 8, but answer goes from 1 to 9
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )
         solution_matrix[i][j]=digit
