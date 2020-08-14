@@ -144,19 +144,19 @@ def scan_image(img):
                 #cv.waitKey(0)
                 i,j = find_cell(rows, columns ,x,y)
                 sudoku_numbers[i][j] = str(predicted[0])
-                print(predicted[0],'at:',i,j)
+                # print(predicted[0],'at:',i,j)
                 # asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,predicted[0]))
     return sudoku_numbers
 
 def solve_sudoku(sudoku_numbers):
-    print(sudoku_numbers)
+    # print(sudoku_numbers)
     asp_lines = []
     for i in range(9):
         for j in range(9):
             num = sudoku_numbers[i][j]
             if num != 0:
                 asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,int(sudoku_numbers[i][j])))
-    print(asp_lines)
+    # print(asp_lines)
     solution_matrix = np.zeros((9,9), dtype=int)
     solution_matrix[sudoku_numbers!=0] = sudoku_numbers[sudoku_numbers!=0]
 
@@ -166,7 +166,7 @@ def solve_sudoku(sudoku_numbers):
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )
         solution_matrix[i][j]=digit
 
-    print(np.transpose(solution_matrix))
+    # print(np.transpose(solution_matrix))
     return solution_matrix, sudoku_numbers
 
 
