@@ -1,7 +1,9 @@
 import subprocess
 import os
 import stat
+import sys
 from pathlib import Path
+
 solverDir = os.path.dirname(os.path.abspath(__file__))
 clingoPath = os.path.join(solverDir,"clingo")
 sparcPath = os.path.join(solverDir,"sparc.jar")
@@ -24,6 +26,7 @@ def solve(aspLines):
 
     os.popen(' '.join(['java','-jar', sparcPath, mySolverPath, '-A >', outputPath]))
     answerSet = open(outputPath, 'r').read()
+    sys.stdout.write(answerSet)
     chosenAnswer = answerSet.strip().split('\n\n')[0]
     entries = chosenAnswer.strip('{}').split(', ')
     return entries
