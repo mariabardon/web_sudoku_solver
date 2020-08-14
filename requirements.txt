@@ -5,5 +5,4 @@ gunicorn==20.0.4
 numpy
 piexif==1.1.3
 Pillow
-opencv-python
-mesa
+opencv-python-headless==4.2.0.32
