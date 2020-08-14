@@ -6,4 +6,4 @@ numpy
 piexif==1.1.3
 Pillow
 opencv-python
-libgl1-mesa-dev
+libglu1-mesa-dev
