@@ -1,1 +1,1 @@
-web: gunicorn web-sudoku-solver.wsgi --log-file -
+web: gunicorn web_sudoku_solver.wsgi
