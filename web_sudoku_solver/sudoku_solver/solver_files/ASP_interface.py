@@ -22,6 +22,7 @@ def solve(aspLines):
 
 
     answerSet = subprocess.check_output(' '.join(['java','-jar', sparcPath, mySolverPath, '-A']),shell=True).decode("utf-8")
+    os.popen(' '.join(['java','-jar', sparcPath, mySolverPath, '-A > sparc_output.txt']))
     chosenAnswer = answerSet.strip().split('\n\n')[0]
     entries = chosenAnswer.strip('{}').split(', ')
     return entries
