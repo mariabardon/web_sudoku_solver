@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web_sudoku_solver.settings.production')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web_sudoku_solver.settings')
 
 application = get_wsgi_application()
