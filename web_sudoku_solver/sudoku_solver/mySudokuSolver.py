@@ -54,8 +54,8 @@ def scan_image(img):
     cv.drawContours(mask,[corners],0,(255,255,255),-1)
     sudoku_masked = np.zeros_like(img)
     sudoku_masked[mask==255] = img[mask==255]
-    #cv.imshow('sudoku_masked', sudoku_masked)
-    #cv.waitKey(0)
+    # cv.imshow('sudoku_masked', sudoku_masked)
+    # cv.waitKey(0)
 
     ############## from grid corners to new grid corners after perspective rectification
     corners=np.squeeze(corners)
@@ -101,8 +101,8 @@ def scan_image(img):
     new_sudoku_masked = np.zeros_like(img)
     new_sudoku_masked[newmask==255] = new_perspective[newmask==255]
 
-    #cv.imshow('sudoku_masked', new_sudoku_masked)
-    #cv.waitKey(0)
+    # cv.imshow('sudoku_masked', new_sudoku_masked)
+    # cv.waitKey(0)
     # createing a grid of 9x9 cells in the area held between the four new corners
     grid_width = max_x - min_x
     grid_hight = max_y - min_y
@@ -111,12 +111,13 @@ def scan_image(img):
     grid_area = grid_width*grid_hight
 
     #find and predict digits in the new image
-    gray = cv.cvtColor(new_sudoku_masked, cv.COLOR_BGR2GRAY)
+    denoised = cv.fastNlMeansDenoisingColored(new_sudoku_masked,None,10,10,7,21)
+    gray = cv.cvtColor(denoised, cv.COLOR_BGR2GRAY)
     gaus = cv.GaussianBlur(gray, (5,5), 0).astype('uint8')
     thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
     contours, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    #cv.imshow('new_threshold', thresh2)
-    #cv.waitKey(0)
+    cv.imshow('new_threshold', thresh2)
+    cv.waitKey(0)
 
     max_area = grid_area//360
     min_area = grid_area//9000
@@ -140,8 +141,8 @@ def scan_image(img):
                 digit = pad_and_resize(digit,imsize)
                 predicted = predictor.predict([digit])
                 #print('predicted', predicted[0])
-                #cv.imshow('digit', digit)
-                #cv.waitKey(0)
+                # cv.imshow('digit', digit)
+                # cv.waitKey(0)
                 i,j = find_cell(rows, columns ,x,y)
                 sudoku_numbers[i][j] = str(predicted[0])
                 # print(predicted[0],'at:',i,j)
@@ -162,7 +163,6 @@ def solve_sudoku(sudoku_numbers):
 
     solution = ASP_interface.solve(asp_lines)
     for e in solution:
-        sys.stdout.write('\nsolution '+e)
         #i and j go from 0 to 8, but answer goes from 1 to 9
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )
         solution_matrix[i][j]=digit
