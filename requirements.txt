@@ -8,3 +8,4 @@ Pillow
 opencv-python-headless==4.2.0.32
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch==1.3.1+cpu
+whitenoise==4.1.4

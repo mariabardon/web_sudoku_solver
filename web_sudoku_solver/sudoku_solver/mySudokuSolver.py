@@ -65,11 +65,11 @@ def scan_image(img):
     bottom_left_index = np.argmax([c[1]-c[0] for c in corners])
     top_right_index = np.argmax([c[0]-c[1] for c in corners])
 
-
-    min_x = min([c[0] for c in corners])
-    min_y = min([c[1] for c in corners])
-    max_x = max([c[0] for c in corners])
-    max_y = max([c[1] for c in corners])
+    a = 5
+    min_x = min([c[0] for c in corners])+a
+    min_y = min([c[1] for c in corners])+a
+    max_x = max([c[0] for c in corners])-a
+    max_y = max([c[1] for c in corners])-a
 
     index_to_new_corner = {top_left_index:[min_x,min_y],\
                            bottom_right_index:[max_x, max_y],\
@@ -82,33 +82,17 @@ def scan_image(img):
     # create and apply homography, with current and new corners, to the required image
     h, status = cv.findHomography(corners, new_corners)
     new_perspective = cv.warpPerspective(img, h, img.shape[:2])
-    #for i<min_x and i> max_x: new_perspective[i,j] = 255
+    new_sudoku_masked = new_perspective[min_y:max_y,min_x:max_x]
 
-    #removing a slice of a pixels from each edge of the sudoku grid
-    a =  5 # constant number added to the mins and maxs to avoide the edge of the sudoku grid.
-    min_x = min([c[0] for c in corners])+a
-    min_y = min([c[1] for c in corners])+a
-    max_x = max([c[0] for c in corners])-a
-    max_y = max([c[1] for c in corners])-a
-    index_to_new_corner = {top_left_index:[min_x,min_y],\
-                           bottom_right_index:[max_x, max_y],\
-                           top_right_index:[max_x,min_y],\
-                           bottom_left_index:[min_x, max_y]}
-
-    new_corners = np.array([index_to_new_corner[index] for index in range(len(corners))])
-    newmask = np.zeros((img.shape),np.uint8)
-    cv.drawContours(newmask,[new_corners],0,(255,255,255),-1)
-    new_sudoku_masked = np.zeros_like(img)
-    new_sudoku_masked[newmask==255] = new_perspective[newmask==255]
-
-    # cv.imshow('sudoku_masked', new_sudoku_masked)
-    # cv.waitKey(0)
-    # createing a grid of 9x9 cells in the area held between the four new corners
     grid_width = max_x - min_x
-    grid_hight = max_y - min_y
+    grid_height = max_y - min_y
     rows = np.arange(min_x, max_x, grid_width//9)
-    columns = np.arange(min_y, max_y, grid_hight//9)
-    grid_area = grid_width*grid_hight
+    columns = np.arange(min_y, max_y, grid_height//9)
+    grid_area = grid_width*grid_height
+
+    rows = np.arange(0, grid_width, grid_width//9)
+    columns = np.arange(0, grid_height, grid_height//9)
+
 
     #find and predict digits in the new image
     denoised = cv.fastNlMeansDenoisingColored(new_sudoku_masked,None,10,10,7,21)
@@ -116,16 +100,16 @@ def scan_image(img):
     gaus = cv.GaussianBlur(gray, (5,5), 0).astype('uint8')
     thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
     contours, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    # cv.imshow('new_threshold', thresh2)
-    # cv.waitKey(0)
+    cv.imshow('new_threshold', thresh2)
+    cv.waitKey(0)
 
     max_area = grid_area//360
     min_area = grid_area//9000
-    max_hight = grid_hight//12
-    min_hight = grid_hight//30
+    max_height = grid_height//12
+    min_height = grid_height//30
 
     #print(grid_area,min_area,max_area)
-    #print(grid_hight,min_hight,max_hight)
+    #print(grid_height,min_height,max_height)
     predictor.load_model()
     imsize = predictor.getIMSIZE()
 
@@ -135,8 +119,7 @@ def scan_image(img):
         area = cv.contourArea(cnt)
         if max_area > area and area > min_area:
             [x,y,w,h] = cv.boundingRect(cnt)
-            #print(area,h)
-            if max_hight > h and h > min_hight:
+            if max_height > h and h > min_height:
                 digit = thresh2[y:y+h,x:x+w]
                 digit = pad_and_resize(digit,imsize)
                 predicted = predictor.predict([digit])
