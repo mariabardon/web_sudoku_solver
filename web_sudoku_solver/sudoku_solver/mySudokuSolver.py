@@ -100,8 +100,8 @@ def scan_image(img):
     gaus = cv.GaussianBlur(gray, (5,5), 0).astype('uint8')
     thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
     contours, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    cv.imshow('new_threshold', thresh2)
-    cv.waitKey(0)
+    # cv.imshow('new_threshold', thresh2)
+    # cv.waitKey(0)
 
     max_area = grid_area//360
     min_area = grid_area//9000

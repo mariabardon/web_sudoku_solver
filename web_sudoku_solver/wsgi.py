@@ -9,12 +9,8 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/
 
 import os
 
-#new line below
-from whitenoise.django imort DjangoWhiteNoise
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web_sudoku_solver.settings')
 
 application = get_wsgi_application()
-#new line below
-application = DjangoWhiteNoise(application)
