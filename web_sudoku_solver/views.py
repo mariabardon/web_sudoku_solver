@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-# from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import numpy as np
 import cv2 as cv

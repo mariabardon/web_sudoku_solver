@@ -28,13 +28,13 @@
       </div>
     </nav>
 
-    <div class="container" align='center' style="max-width: 650px; margin: auto;">
-      <h1 class="display-4">My Sudoku Solver</h1>
-      <p class="lead">Upload an image of an empty sudoku and I will solve it for you</p>
+    <div class="container" align='center'>
+      <h1 class="display-2">My Sudoku Solver</h1>
+      <!-- <p class="lead">Upload an image of an empty sudoku and I will solve it for you</p> -->
       <form method="post" class="md-form" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="container" >
-          <label id='chooseButton' for="choose" class="btn" align='center'>Upload Your Image</label>
+        <div class="container" align='left'>
+          <label id='chooseButton' for="choose" class="btn">Upload Image</label>
           <input id="choose" name='fileName' style="visibility:hidden;" type="file" value='image'>
         </div>
         <div class="row">
@@ -76,7 +76,7 @@
               </div>
             </div>
             <div class="column">
-              <button id='solveButton' type="submit"  name='solve' class="btn">Solve Sudoku</button>
+              <button id='solveButton' type="submit"  name='solve' class="btn">Solve</button>
             </div>
           </div>
 

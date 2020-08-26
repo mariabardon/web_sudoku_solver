@@ -9,11 +9,11 @@
 } */
 
 .btn{
-  border-radius: 15px;
-  height: 40px;
+  border-radius: 25px;
+  /* height: 40px; */
   /* width: 175px; */
-  font-family: "Montserrat";
-  font-size: 1.2em;
+  /* font-family: "Montserrat"; */
+  font-size: 48px;
   margin-bottom: 4px;
 }
 
@@ -33,7 +33,7 @@ table {
 td {
   border:1px solid;
   text-align:center;
-  /* font-size: 2vw; */
+  font-size: 3vw;
 }
 td:first-child {
   border-left:solid;
