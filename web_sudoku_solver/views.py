@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+# from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import numpy as np
 import cv2 as cv
@@ -16,6 +17,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 import piexif
 global file_url
+file_url = os.path.join(settings.BASE_DIR,'static','media','pic.jpg')
 
 def index(request):
     global file_url
@@ -74,10 +76,10 @@ def save_image(image):
     outputIoStream.seek(0)
     image.save(outputIoStream , format='JPEG')
     f = InMemoryUploadedFile(outputIoStream,'ImageField', file_name, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
+    clear_media_folder()
     file_name_2 = default_storage.save(file_name, f)
     file_url = default_storage.url(file_name_2)
     return file_url
-
 
 # https://piexif.readthedocs.io/en/latest/sample.html
 def rotate_with_exif_and_save(filename):
