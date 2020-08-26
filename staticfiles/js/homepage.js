@@ -2,6 +2,6 @@
 $('h1').click(function(){
 });
 
-document.getElementById('fileName').onchange = function() {
+document.getElementById('choose').onchange = function() {
   this.form.submit();
 };
