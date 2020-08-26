@@ -104,8 +104,8 @@ def scan_image(img):
     # cv.waitKey(0)
 
     max_area = grid_area//360
-    min_area = grid_area//9000
-    max_height = grid_height//12
+    min_area = grid_area//5000
+    max_height = grid_height//20
     min_height = grid_height//30
 
     #print(grid_area,min_area,max_area)
@@ -117,6 +117,11 @@ def scan_image(img):
     # asp_lines = []
     for cnt in contours:
         area = cv.contourArea(cnt)
+
+        # [x,y,w,h] = cv.boundingRect(cnt)
+        # digit = thresh2[y:y+h,x:x+w]
+        # cv.imshow(str(area), digit)
+        # cv.waitKey(0)
         if max_area > area and area > min_area:
             [x,y,w,h] = cv.boundingRect(cnt)
             if max_height > h and h > min_height:
@@ -124,8 +129,9 @@ def scan_image(img):
                 digit = pad_and_resize(digit,imsize)
                 predicted = predictor.predict([digit])
                 #print('predicted', predicted[0])
-                # cv.imshow('digit', digit)
-                # cv.waitKey(0)
+
+
+
                 i,j = find_cell(rows, columns ,x,y)
                 sudoku_numbers[i][j] = str(predicted[0])
                 # print(predicted[0],'at:',i,j)
