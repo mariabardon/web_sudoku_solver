@@ -22,7 +22,6 @@ def index(request):
     response = {}
     if  request.method == "POST":
         if 'solve' in request.POST:
-            print('url', file_url)
             numpy_image = cv.imread(file_url)
             original_numbers = mySudokuSolver.scan_image(numpy_image)
             solution = mySudokuSolver.solve_sudoku(original_numbers)
