@@ -100,13 +100,14 @@ def scan_image(img):
     gaus = cv.GaussianBlur(gray, (5,5), 0).astype('uint8')
     thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
     contours, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    # cv.imshow('new_threshold', thresh2)
-    # cv.waitKey(0)
+    cv.imshow('denoised 1', thresh2)
+    cv.waitKey(0)
+
 
     max_area = grid_area//360
     min_area = grid_area//5000
-    max_height = grid_height//20
-    min_height = grid_height//30
+    max_height = grid_height//12
+    min_height = grid_height//24
 
     #print(grid_area,min_area,max_area)
     #print(grid_height,min_height,max_height)
@@ -117,21 +118,22 @@ def scan_image(img):
     # asp_lines = []
     for cnt in contours:
         area = cv.contourArea(cnt)
-
+        #
         # [x,y,w,h] = cv.boundingRect(cnt)
         # digit = thresh2[y:y+h,x:x+w]
-        # cv.imshow(str(area), digit)
+        # cv.imshow(str(min_area)+'  '+str(max_area)+'  '+str(area), digit)
         # cv.waitKey(0)
         if max_area > area and area > min_area:
             [x,y,w,h] = cv.boundingRect(cnt)
+            digit = thresh2[y:y+h,x:x+w]
+            cv.imshow(str(min_height)+'  '+str(max_height)+'  '+str(h), digit)
+            cv.waitKey(0)
             if max_height > h and h > min_height:
                 digit = thresh2[y:y+h,x:x+w]
                 digit = pad_and_resize(digit,imsize)
                 predicted = predictor.predict([digit])
-                #print('predicted', predicted[0])
-
-
-
+                # cv.imshow(str(min_height)+'  '+str(max_height)+'  '+str(h), digit)
+                # cv.waitKey(0)
                 i,j = find_cell(rows, columns ,x,y)
                 sudoku_numbers[i][j] = str(predicted[0])
                 # print(predicted[0],'at:',i,j)
@@ -150,7 +152,14 @@ def solve_sudoku(sudoku_numbers):
     solution_matrix = np.zeros((9,9), dtype=int)
     solution_matrix[sudoku_numbers!=0] = sudoku_numbers[sudoku_numbers!=0]
 
-    solution = ASP_interface.solve(asp_lines)
+
+    try:
+        solution = ASP_interface.solve(asp_lines)
+    except RuntimeError as err:
+        print('RuntimeError')
+        print(err)
+        solution = ''
+
     for e in solution:
         #i and j go from 0 to 8, but answer goes from 1 to 9
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )

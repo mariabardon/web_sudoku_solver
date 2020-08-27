@@ -28,20 +28,57 @@
       </div>
     </nav>
 
-    <div class="container" align='center'>
-      <h1 class="display-2">My Sudoku Solver</h1>
+    <div class="container" align='center' style="max-width: 650px; margin: auto;">
+      <h1 class="display-3">My Sudoku Solver</h1>
       <!-- <p class="lead">Upload an image of an empty sudoku and I will solve it for you</p> -->
       <form method="post" class="md-form" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="container" align='left'>
+        <div class="container" align='center'>
           <label id='chooseButton' for="choose" class="btn">Upload Image</label>
           <input id="choose" name='fileName' style="visibility:hidden;" type="file" value='image'>
         </div>
+        {% if img_url %}
         <div class="row">
+          <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;" >
+        </div>
+        <div class="row">
+          <div class="column">
+            <div class="column">
+              <button id='solveButton' type="submit"  name='right' class="btn"> <i class="fa fa-rotate-right"></i></button>
+            </div>
+            <div class="column">
+              <button id='solveButton' type="submit"  name='left' class="btn"> <i class="fa fa-rotate-left"></i></button>
+            </div>
+          </div>
+          <div class="column">
+            <button id='solveButton' type="submit"  name='solve' class="btn">Solve</button>
+          </div>
+        </div>
+        {% endif %}
+        {% if original_numbers.0.0.0 %}
+          <div>
+            <table >
+              {% for original_numbers_row in original_numbers %}
+              <tr>
+                  {% for s in original_numbers_row %}
+                  <td>
+                    {% if s.1 == 0 %} <font style="color: red;" class='solved'>
+                    {% else %} <font style="color: black;">
+                    {% endif %}
+                    {{s.0}}
+                  </font>
+                  </td>
+                  {% endfor %}
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% endif %}
+
+        <!-- <div class="row">
           <div class='column' >
             {% if img_url %}
             <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;" >
-            <!-- {{img_url}} -->
             {% endif %}
           </div>
           <div class='column'>
@@ -79,8 +116,7 @@
               <button id='solveButton' type="submit"  name='solve' class="btn">Solve</button>
             </div>
           </div>
-
-          {% endif %}
+          {% endif %}-->
         </div>
       </form>
 

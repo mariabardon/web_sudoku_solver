@@ -3,6 +3,7 @@ import os
 import stat
 import sys
 from pathlib import Path
+import time
 
 solverDir = os.path.dirname(os.path.abspath(__file__))
 clingoPath = os.path.join(solverDir,"clingo")
@@ -25,9 +26,30 @@ def solve(aspLines):
 
     # os.popen(' '.join(['java','-jar', sparcPath, mySolverPath, '-A >', outputPath]))
     pipe = subprocess.Popen(['java','-jar', sparcPath, mySolverPath, '-A'], stdout=subprocess.PIPE)
+    try:
+        wait_timeout(pipe, 5)
+    except RuntimeError as e:
+        raise e
+
+
+
     answerSet = pipe.stdout.read().decode('utf-8')
     sys.stdout.write('answerSet')
     sys.stdout.write(answerSet)
     chosenAnswer = answerSet.strip().split('\n\n')[0]
     entries = chosenAnswer.strip('{}').split(', ')
     return entries
+
+def wait_timeout(proc, seconds):
+    """Wait for a process to finish, or raise exception after timeout"""
+    start = time.time()
+    end = start + seconds
+    interval = min(seconds / 1000.0, .25)
+
+    while True:
+        result = proc.poll()
+        if result is not None:
+            return result
+        if time.time() >= end:
+            raise RuntimeError("Process timed out")
+        time.sleep(interval)

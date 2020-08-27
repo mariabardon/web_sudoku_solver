@@ -42,6 +42,8 @@ assignated_value(C) :- value(C,D).
 % display
 
 % value.
+value(cell(4,3),5).
+value(cell(6,9),1).
 %%%%%%%%%%%%
 display
 %%%%%%%%%%%%
