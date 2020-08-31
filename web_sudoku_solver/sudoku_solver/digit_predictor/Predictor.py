@@ -2,6 +2,8 @@ import torch
 from .train import model
 import cv2
 import numpy as np
+import torch.nn as nn
+
 
 import os
 
@@ -28,6 +30,7 @@ def predict(imgs):
     imgs = np.expand_dims(imgs,1)
     if(np.max(imgs) > 1): imgs = imgs/255
     tensor_imgs = torch.tensor(np.array(imgs)).float()
-    output = predictor(tensor_imgs).detach().numpy()
-    prediction = [np.argmax(np.squeeze(o))+1 for o in output]
+    tensor_output = predictor(tensor_imgs)
+    output = nn.functional.softmax(tensor_output,1)
+    prediction = [np.argmax(output.detach().numpy())+1 for o in output]
     return(prediction)

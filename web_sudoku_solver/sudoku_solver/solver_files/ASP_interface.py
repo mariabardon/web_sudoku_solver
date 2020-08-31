@@ -23,7 +23,6 @@ def solve(aspLines):
     st = os.stat(sparcPath)
     os.chmod(sparcPath, st.st_mode | stat.S_IEXEC)
 
-
     # os.popen(' '.join(['java','-jar', sparcPath, mySolverPath, '-A >', outputPath]))
     pipe = subprocess.Popen(['java','-jar', sparcPath, mySolverPath, '-A'], stdout=subprocess.PIPE)
     try:

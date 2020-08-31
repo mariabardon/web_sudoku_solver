@@ -36,25 +36,24 @@
         <div class="container" align='center'>
           <label id='chooseButton' for="choose" class="btn">Upload Image</label>
           <input id="choose" name='fileName' style="visibility:hidden;" type="file" value='image'>
-        </div>
-        {% if img_url %}
-        <div class="row">
-          <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;" >
-        </div>
-        <div class="row">
-          <div class="column">
+          {% if img_url %}
+          <div class="row">
             <div class="column">
-              <button id='solveButton' type="submit"  name='right' class="btn"> <i class="fa fa-rotate-right"></i></button>
+              <div class="column">
+                <button id='solveButton' type="submit"  name='right' class="btn"> <i class="fa fa-rotate-right"></i></button>
+              </div>
+              <div class="column">
+                <button id='solveButton' type="submit"  name='left' class="btn"> <i class="fa fa-rotate-left"></i></button>
+              </div>
             </div>
             <div class="column">
-              <button id='solveButton' type="submit"  name='left' class="btn"> <i class="fa fa-rotate-left"></i></button>
+              <button id='solveButton' type="submit"  name='solve' class="btn">Solve</button>
             </div>
           </div>
-          <div class="column">
-            <button id='solveButton' type="submit"  name='solve' class="btn">Solve</button>
-          </div>
+          {% endif %}
+
         </div>
-        {% endif %}
+
         {% if original_numbers.0.0.0 %}
           <div>
             <table >
@@ -75,48 +74,13 @@
           </div>
         {% endif %}
 
-        <!-- <div class="row">
-          <div class='column' >
-            {% if img_url %}
-            <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;" >
-            {% endif %}
-          </div>
-          <div class='column'>
-          {% if original_numbers.0.0.0 %}
-            <table >
-              {% for original_numbers_row in original_numbers %}
-              <tr>
-                  {% for s in original_numbers_row %}
-                  <td>
-                    {% if s.1 == 0 %} <font style="color: red;" class='solved'>
-                    {% else %} <font style="color: black;">
-                    {% endif %}
-                    {{s.0}}
-                  </font>
-                  </td>
-                  {% endfor %}
-              </tr>
-              {% endfor %}
-            </table>
-            {% endif %}
-          </div>
+        {% if img_url %}
+        <div class="">
+        <div class="container">
+          <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;" >
         </div>
-        <div class="row">
-          {% if img_url %}
-          <div class="column">
-            <div class="column">
-              <div class="column">
-                <button id='solveButton' type="submit"  name='right' class="btn"> <i class="fa fa-rotate-right"></i></button>
-              </div>
-              <div class="column">
-                <button id='solveButton' type="submit"  name='left' class="btn"> <i class="fa fa-rotate-left"></i></button>
-              </div>
-            </div>
-            <div class="column">
-              <button id='solveButton' type="submit"  name='solve' class="btn">Solve</button>
-            </div>
-          </div>
-          {% endif %}-->
+        {% endif %}
+
         </div>
       </form>
 
