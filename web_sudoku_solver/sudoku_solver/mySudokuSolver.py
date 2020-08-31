@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import re
-from imutils import contours
+# from imutils import contours
 #import digit_predictor.Predictor as predictor
 #import solver_files.ASP_interface as ASP_interface
 from .digit_predictor import Predictor as predictor
