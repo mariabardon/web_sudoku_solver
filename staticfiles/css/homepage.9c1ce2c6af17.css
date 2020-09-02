@@ -9,21 +9,24 @@
 } */
 
 .btn{
-  border-radius: 15px;
-  height: 40px;
+  border-radius: 25px;
+  /* height: 40px; */
   /* width: 175px; */
-  font-family: "Montserrat";
-  font-size: 1.2em;
+  /* font-family: "Montserrat"; */
+  height: 92px;
+  font-size: 48px;
   margin-bottom: 4px;
+  background: #41a5cc;
 }
 
 #chooseButton{
   background: #FF9F1C;
 }
 
-#solveButton{
-  background: #41a5cc;
+#rotateButton{
+  width: 92px;
 }
+
 
 
 table {
@@ -33,7 +36,7 @@ table {
 td {
   border:1px solid;
   text-align:center;
-  /* font-size: 2vw; */
+  font-size: 3vw;
 }
 td:first-child {
   border-left:solid;

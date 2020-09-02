@@ -33,4 +33,7 @@ def predict(imgs):
     tensor_output = predictor(tensor_imgs)
     output = nn.functional.softmax(tensor_output,1)
     prediction = [np.argmax(output.detach().numpy())+1 for o in output]
+    # prediction = [np.argmax(tensor_output.detach().numpy())+1 for o in tensor_output]
+    # print(output)
+    # print(max(output.detach().numpy()))
     return(prediction)

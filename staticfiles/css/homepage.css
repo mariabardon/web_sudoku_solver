@@ -13,17 +13,20 @@
   /* height: 40px; */
   /* width: 175px; */
   /* font-family: "Montserrat"; */
+  height: 92px;
   font-size: 48px;
   margin-bottom: 4px;
+  background: #41a5cc;
 }
 
 #chooseButton{
   background: #FF9F1C;
 }
 
-#solveButton{
-  background: #41a5cc;
+#rotateButton{
+  width: 92px;
 }
+
 
 
 table {

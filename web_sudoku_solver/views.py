@@ -73,7 +73,12 @@ def save_image(image):
     file_name = "pic.jpg"
     outputIoStream = BytesIO()
     outputIoStream.seek(0)
-    image.save(outputIoStream , format='JPEG')
+    w,h = image.size
+    image = image.resize((500,500*h//w))
+    try:
+        image.save(outputIoStream , format='JPEG')
+    except:
+        image.save(outputIoStream, format='png')
     f = InMemoryUploadedFile(outputIoStream,'ImageField', file_name, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
     clear_media_folder()
     file_name_2 = default_storage.save(file_name, f)
@@ -102,7 +107,7 @@ def rotate_with_exif_and_save(filename):
                 img = img.rotate(90, expand=True).transpose(Image.FLIP_LEFT_RIGHT)
             elif orientation == 8:
                 img = img.rotate(90, expand=True)
-            return save_image(img)
+    return save_image(img)
 
 
 def rotate_and_save(file_url,d):
