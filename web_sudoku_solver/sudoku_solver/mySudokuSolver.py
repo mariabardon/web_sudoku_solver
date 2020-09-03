@@ -77,6 +77,11 @@ def scan_image(img):
                            top_right_index:[max_x,min_y],\
                            bottom_left_index:[min_x, max_y]}
 
+    cv.imshow(str(index_to_new_corner),thresh)
+    cv.waitKey(0)
+
+    print('len of conrenrs' , len(corners))
+    print(corners)
     new_corners = np.array([index_to_new_corner[index] for index in range(len(corners))])
     ##############
 
@@ -98,10 +103,14 @@ def scan_image(img):
     gaus = cv.GaussianBlur(gray, (5,5), 0).astype('uint8')
     thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
     my_contours_cropped, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
+    cv.imshow('thresh2',thresh2)
+    cv.waitKey(0)
 
     area_range = list(range(200,2700))
     height_range = list(range(30,90))
     width_range = list(range(15,60))
+    cv.imshow('thresh 2',thresh2)
+    cv.waitKey(0)
 
     mean = np.mean([cv.contourArea(c)  for c in my_contours_cropped if cv.contourArea(c) in area_range])
     d = mean.astype(int)//100
@@ -121,8 +130,8 @@ def scan_image(img):
                 digit = pad_and_resize(digit,predictor.getIMSIZE())
                 predicted = predictor.predict([digit])
                 sudoku_numbers[i][j] = str(predicted[0])
-                # cv.imshow(str(digit),digit)
-                # cv.waitKey(0)
+                cv.imshow(str(predicted),digit)
+                cv.waitKey(0)
     return sudoku_numbers
 
 def solve_sudoku(sudoku_numbers):
