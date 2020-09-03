@@ -1,33 +1,20 @@
-/* body{
-  font-family: 'Montserrat';
-  color: #FDFFFC;
-  text-align: center;
-  background-color: #011627;
-  border: 60px solid #2EC4B6;
-  border-top: 0px;
-  margin: 0px;
-} */
-
 .btn{
-  border-radius: 25px;
-  /* height: 40px; */
-  /* width: 175px; */
-  /* font-family: "Montserrat"; */
-  height: 92px;
-  font-size: 48px;
-  margin-bottom: 4px;
+  border-radius: 10px;
+  /* height: 1vwpx; */
+  font-size: 3vw;
+  margin-bottom: 2px;
   background: #41a5cc;
 }
 
 #chooseButton{
   background: #FF9F1C;
-  /* background: #41a5cc; */
+  width:60%;
+  font-size: 3vw;
 }
 
 #rotateButton{
-  width: 92px;
+  /* width: 46px; */
 }
-
 
 
 table {
@@ -37,7 +24,10 @@ table {
 td {
   border:1px solid;
   text-align:center;
+  /* font-size: 26px; */
   font-size: 3vw;
+  font-weight: bold;
+  /* padding-bottom: 1%; */
 }
 td:first-child {
   border-left:solid;
@@ -51,33 +41,31 @@ tr:first-child {
 tr:nth-child(3n) td {
   border-bottom:solid ;
 }
+
 .column {
   float: left;
   width: 50%;
-  padding: 5px;
+  /* padding: 5px; */
 }
-/* Clear floats after image containers */
 .row::after {
   content: "";
   clear: both;
   display: table;
 }
-.fa {
-  /* padding: 20px; */
-  font-size: 100px;
-  width: 100px;
-  text-align: center;
-  text-decoration: none;
+
+.fa-github {
+  font-size: 44px;
+  width: 60px;
   margin: 5px 2px;
 }
 .fa-linkedin {
   background: #007bb5;
   color: white;
-  padding: 8px;
-  font-size: 70px;
-  width: 84px;
+  padding: 3px;
+  font-size: 32px;
+  width: 40px;
   text-align: center;
   text-decoration: none;
-  margin: 15px 25px;
-  border-radius: 10px;
+  margin: 5px 2px;
+  border-radius: 5px;
 }
