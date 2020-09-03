@@ -1,19 +1,17 @@
 .btn{
-  border-radius: 10px;
+  border-radius: 1vw;
   /* height: 1vwpx; */
-  font-size: 3vw;
-  margin-bottom: 2px;
+  font-size: 4vw;
+  margin-bottom: 0.2vw;
   background: #41a5cc;
 }
 
 #chooseButton{
   background: #FF9F1C;
-  width:60%;
-  font-size: 3vw;
 }
 
 #rotateButton{
-  /* width: 46px; */
+  width: 7vw;
 }
 
 
@@ -54,11 +52,29 @@ tr:nth-child(3n) td {
 }
 
 .fa-github {
+  font-size: 4.5vw;
+  margin: 1vw;
+
+  /* width: 6vw; */
+}
+/* .fa-github {
   font-size: 44px;
   width: 60px;
   margin: 5px 2px;
-}
+} */
 .fa-linkedin {
+  background: #007bb5;
+  color: white;
+  padding: 0.5vw;
+  font-size: 3vw;
+  width: 4vw;
+  /* height: 4vw; */
+  text-align: center;
+  text-decoration: none;
+  margin: 1vw;
+  border-radius: 0.5vw;
+}
+/* .fa-linkedin {
   background: #007bb5;
   color: white;
   padding: 3px;
@@ -68,4 +84,4 @@ tr:nth-child(3n) td {
   text-decoration: none;
   margin: 5px 2px;
   border-radius: 5px;
-}
+} */
