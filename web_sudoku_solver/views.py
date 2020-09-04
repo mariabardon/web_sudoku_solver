@@ -49,7 +49,8 @@ def index(request):
 
 def clear_media_folder():
     folder = os.path.join(settings.BASE_DIR,'static','media')
-    for filename in os.listdir(folder):
+    for filename in [f for f in os.listdir(folder) if 'my_logo' not in f]:
+        print('filename',filename)
         file_path = os.path.join(folder, filename)
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -59,7 +60,8 @@ def clear_media_folder():
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
     folder= os.path.join(settings.BASE_DIR,'staticfiles','media')
-    for filename in os.listdir(folder):
+    for filename in [f for f in os.listdir(folder) if 'my_logo' not in f]:
+        print('filename',filename)
         file_path = os.path.join(folder, filename)
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -74,7 +76,7 @@ def save_image(image):
     outputIoStream = BytesIO()
     outputIoStream.seek(0)
     w,h = image.size
-    image = image.resize((500,500*h//w))
+    # image = image.resize((500,500*h//w))
     try:
         image.save(outputIoStream , format='JPEG')
     except:

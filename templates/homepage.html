@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
 
-
 <html lang="en" dir="ltr">
   <head>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
@@ -12,29 +11,31 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-light">
-      <a href="https://github.com/Rociogomezbardon" class="fa fa-github"></a>
-      <a href="https://www.linkedin.com/in/rocio-gomez-bardon/" class="fa fa-linkedin"></a>
-      <!-- <a href="/" class="navbar-brand">Welcome</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-controls="bs-example-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-light" >
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar-collapse-1" aria-controls="navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      </button> -->
+    <nav class="navbar navbar-expand-sm navbar-light bg-faded">
+      <div class="logo">
+        <img src="static/media/my_logo/RocioGomez.png" style="width: 200px;padding:4px;margin: 15px;">
+      </div>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="ml-auto navbar-nav">
           <li class="nav-item">
-            <a href="https://www.linkedin.com/in/rocio-gomez-bardon/" class="nav-link">Linkedin</a>
+            <a href="https://github.com/Rociogomezbardon" class="fa fa-github"></a>
           </li>
           <li class="nav-item">
-            <a href="https://github.com/Rociogomezbardon" class="nav-link">GitHub</a>
+            <a href="https://www.linkedin.com/in/rocio-gomez-bardon/" class="fa fa-linkedin"></a>
+          </li>
+          <li>
+          <a href="mailto:rociogomezbardon@gmail.com" class="fa fa-envelope-o"> </a>
           </li>
         </ul>
-      </div> -->
-
-
+      </div>
     </nav>
-
-
-
     <div class="container" align='center' style="width: 60%; margin: auto;">
     <!-- <div class="container" align='center' style="max-width: 400px; margin: auto;"> -->
       <h1 style="font-size: 5vw;">My Sudoku Solver</h1>
@@ -59,9 +60,7 @@
             </div>
           </div>
           {% endif %}
-
         </div>
-
         {% if original_numbers.0.0.0 %}
           <div style= "margin-top:0px; margin-bottom:0px;">
             <table >
@@ -81,16 +80,14 @@
             </table>
           </div>
         {% endif %}
-
         {% if img_url %}
+        <div>
         <div>
           <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;margin-top: 15px;" >
         </div>
         {% endif %}
-
         </div>
       </form>
-
     </div>
 
     <!-- Need to have JQuery and Javascript for DropDown Actions to work -->
@@ -100,7 +97,5 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="{% static 'js/homepage.js' %}?version=1"></script>
     <link rel="stylesheet" href= "{% static  'css/homepage.css' %}?version=1">
-
-
   </body>
 </html>

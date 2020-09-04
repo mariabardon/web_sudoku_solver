@@ -1,18 +1,22 @@
 .btn{
   border-radius: 1vw;
+  /* height: 1vwpx; */
   font-size: 4vw;
   margin-bottom: 0.2vw;
-  background: rgba(24, 129, 220, 1);
+  background: #41a5cc;
 }
 .navbar{
   margin-left: auto;
 }
 #chooseButton{
-  background: rgba(220, 119, 24, 1);
+  background: #FF9F1C;
 }
+
 #rotateButton{
   width: 7vw;
 }
+
+
 table {
   width:100%;
   border-collapse: collapse;
@@ -20,8 +24,10 @@ table {
 td {
   border:0.1vw solid;
   text-align:center;
+  /* font-size: 26px; */
   font-size: 3vw;
   font-weight: bold;
+  /* padding-bottom: 1%; */
 }
 td:first-child {
   border-left:solid;
@@ -35,56 +41,36 @@ tr:first-child {
 tr:nth-child(3n) td {
   border-bottom:solid ;
 }
+
 .column {
   float: left;
   width: 50%;
+  /* padding: 5px; */
 }
 .row::after {
   content: "";
   clear: both;
   display: table;
 }
+
 .fa-github {
-  color: white;
-  font-size: 40px;
-  margin: 10px;
+  font-size: 5.5vw;
+  margin: 1vw;
 }
+
 .fa-linkedin {
+  /* background: #007bb5; */
   color: white;
-  font-size: 40px;
+  padding: 1vw;
+  font-size: 2.8vw;
+  width: 4.8vw;
   text-align: center;
   text-decoration: none;
-  margin: 10px;
+  margin: 1.5vw;
   border-radius: 50%;
 }
 
 .fa-envelope-o{
-  margin: 10px;
-  font-size: 40px;
-  color: white;
+  margin: 1vw;
+  font-size: 5vw;
 }
-.navbar{
-    background: rgba(18, 89, 160);
-    position: relative;
-}
-
-.logo {
-  transform: translateX(-50%);
-  left: 50%;
-  position: absolute;
-}
-
-h1{
-    /* color: rgb(18, 89, 160); */
-    color: lapis-lazuli;
-}
-body{
-  background-color: rgba(163, 203, 245, 1);
-}
-
-/* SCSS RGB */
-$lapis-lazuli: rgba(18, 89, 160, 1);
-$green-blue-crayola: rgba(24, 129, 220, 1);
-$dodger-blue: rgba(76, 150, 235, 1);
-$baby-blue-eyes: rgba(163, 203, 245, 1);
-$ochre: rgba(220, 119, 24, 1);

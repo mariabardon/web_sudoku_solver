@@ -47,6 +47,7 @@ def get_contour_center(c):
     cY = int(M["m01"] / M["m00"])
     return(cX,cY)
 
+
 def scan_image(img):
     img = scaleImg(img)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
