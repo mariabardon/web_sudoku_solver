@@ -1,7 +1,7 @@
 .btn{
   border-radius: 1vw;
   font-size: 4vw;
-  margin-bottom: 0.2vw;
+  margin-bottom: 0.1vw;
   background: rgba(24, 129, 220, 1);
 }
 .navbar{
@@ -10,8 +10,13 @@
 #chooseButton{
   background: rgba(220, 119, 24, 1);
 }
-#rotateButton{
-  width: 9vw;
+#rotateIcon{
+  text-align: center;
+  color: black;
+  width: auto;
+  font-size: 3vw;
+  color: black;
+  margin: 0.1vw;
 }
 table {
   width:100%;
