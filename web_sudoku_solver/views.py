@@ -76,7 +76,7 @@ def save_image(image):
     outputIoStream = BytesIO()
     outputIoStream.seek(0)
     w,h = image.size
-    # image = image.resize((500,500*h//w))
+    image = image.resize((500,500*h//w))
     try:
         image.save(outputIoStream , format='JPEG')
     except:
