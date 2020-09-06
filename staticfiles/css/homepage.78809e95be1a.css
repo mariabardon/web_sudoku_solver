@@ -1,7 +1,7 @@
 .btn{
   border-radius: 1vw;
   font-size: 4vw;
-  margin-bottom: 0.2vw;
+  margin-bottom: 0.1vw;
   background: rgba(24, 129, 220, 1);
 }
 .navbar{
@@ -10,8 +10,13 @@
 #chooseButton{
   background: rgba(220, 119, 24, 1);
 }
-#rotateButton{
-  width: 7vw;
+#rotateIcon{
+  text-align: center;
+  color: black;
+  width: auto;
+  font-size: 3vw;
+  color: black;
+  margin: 0.1vw;
 }
 table {
   width:100%;
@@ -44,24 +49,12 @@ tr:nth-child(3n) td {
   clear: both;
   display: table;
 }
-.fa-github {
+.fa{
   color: white;
-  font-size: 40px;
-  margin: 10px;
-}
-.fa-linkedin {
-  color: white;
-  font-size: 40px;
-  text-align: center;
-  text-decoration: none;
-  margin: 10px;
-  border-radius: 50%;
-}
-
-.fa-envelope-o{
-  margin: 10px;
-  font-size: 40px;
-  color: white;
+  font-size: 5vw;
+  margin: 1.5vw;
+  margin-top: 2vw;
+  margin-bottom: 2vw;
 }
 .navbar{
     background: rgba(18, 89, 160);
@@ -72,6 +65,8 @@ tr:nth-child(3n) td {
   transform: translateX(-50%);
   left: 50%;
   position: absolute;
+  margin-top: 1vw;
+  margin-bottom: 1vw;
 }
 
 h1{
