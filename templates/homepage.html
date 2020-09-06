@@ -46,6 +46,9 @@
           <label id='chooseButton' for="choose" class="btn">Upload Image</label>
           <input id="choose" name='fileName' style="visibility:hidden;font-size: 3vw;" type="file" value='image'>
           {% if img_url  and not original_numbers.0.0.0%}
+          <div class="">
+            {{img_url}}
+          </div>
           <div class="row">
             <div class="column">
               <div class="column">

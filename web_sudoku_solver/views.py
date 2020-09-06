@@ -50,7 +50,6 @@ def index(request):
 def clear_media_folder():
     folder = os.path.join(settings.BASE_DIR,'static','media')
     for filename in [f for f in os.listdir(folder) if 'my_logo' not in f]:
-        print('filename',filename)
         file_path = os.path.join(folder, filename)
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -61,7 +60,6 @@ def clear_media_folder():
             print('Failed to delete %s. Reason: %s' % (file_path, e))
     folder= os.path.join(settings.BASE_DIR,'staticfiles','media')
     for filename in [f for f in os.listdir(folder) if 'my_logo' not in f]:
-        print('filename',filename)
         file_path = os.path.join(folder, filename)
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -85,6 +83,7 @@ def save_image(image):
     clear_media_folder()
     file_name_2 = default_storage.save(file_name, f)
     file_url = default_storage.url(file_name_2)
+    sys.stdout.write('image saved at ' + file_url)
     return file_url
 
 # https://piexif.readthedocs.io/en/latest/sample.html
