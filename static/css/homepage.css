@@ -52,7 +52,7 @@ tr:nth-child(3n) td {
 .fa{
   color: white;
   font-size: 5vw;
-  margin: 1.5vw;
+  margin-left: 4vw;
   margin-top: 2vw;
   margin-bottom: 2vw;
 }
@@ -61,13 +61,21 @@ tr:nth-child(3n) td {
     position: relative;
 }
 
-.logo {
+/* .logo {
   transform: translateX(-50%);
   left: 50%;
   position: absolute;
   margin-top: 1vw;
   margin-bottom: 1vw;
+} */
+
+.logo {
+  right: 1%;
+  position: absolute;
+  margin-top: 1vw;
+  margin-bottom: 1vw;
 }
+
 
 h1{
     /* color: rgb(18, 89, 160); */

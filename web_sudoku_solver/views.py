@@ -83,7 +83,6 @@ def save_image(image):
     clear_media_folder()
     file_name_2 = default_storage.save(file_name, f)
     file_url = default_storage.url(file_name_2)
-    sys.stdout.write('image saved at ' + file_url)
     return file_url
 
 # https://piexif.readthedocs.io/en/latest/sample.html

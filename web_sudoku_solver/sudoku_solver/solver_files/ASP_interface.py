@@ -33,8 +33,8 @@ def solve(aspLines):
 
 
     answerSet = pipe.stdout.read().decode('utf-8')
-    sys.stdout.write('answerSet')
-    sys.stdout.write(answerSet)
+    # sys.stdout.write('answerSet')
+    # sys.stdout.write(answerSet)
     chosenAnswer = answerSet.strip().split('\n\n')[0]
     entries = chosenAnswer.strip('{}').split(', ')
     return entries

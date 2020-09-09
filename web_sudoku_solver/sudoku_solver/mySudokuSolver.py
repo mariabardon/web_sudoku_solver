@@ -18,8 +18,7 @@ def pad_and_resize(digit,imsize):
     digit = cv.resize(digit,(imsize,imsize))
     return digit
 
-def scaleImg(img):
-    dim = (900,900)
+def scaleImg(img,dim):
     img = cv.resize(img, dim, interpolation = cv.INTER_AREA)
     return img
 
@@ -27,7 +26,7 @@ def find_cell(x_array, y_array ,c):
     [x,y] = c
     i = max([i for i,x_coor in enumerate(x_array) if x_coor < x])
     j = max([j for j,y_coor in enumerate(y_array) if y_coor < y])
-    return i,j
+    return (i,j)
 
 def get_cells_centers(rows,columns):
     arr = []
@@ -49,24 +48,50 @@ def get_contour_center(c):
 
 
 def scan_image(img):
-    img = scaleImg(img)
+    area_range = list(range(150,2700))
+    height_range = list(range(30,90))
+    width_range = list(range(15,60))
+    grid_width = 900
+    grid_height = 900
+    grid_area = grid_width*grid_height
+    rows = np.arange(0, grid_height, grid_height//9)
+    columns = np.arange(0, grid_width, grid_width//9)
+
+    s = img.shape
+    dim = (2000*s[1]//s[0],2000)
+    # dim = (900,900)
+    img = scaleImg(img,dim)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    gaus = cv.GaussianBlur(gray, (5,5), 0)
+    gaus = cv.GaussianBlur(gray, (9,9), 0)
     thresh = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
+    p = 4
+    thresh = cv.morphologyEx(thresh, cv.MORPH_CLOSE, kernel=np.ones((p,p),np.uint8))
     my_contours, _ = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[-2:]
+    # cv.imshow('thresh',thresh)
+    # cv.waitKey(0)
+
     # get contour with largest area (which is sudoku grid outside border),
     # approximate as polygonal shape
     largest_area = max([cv.contourArea(c) for c in my_contours])
-    outside_contour = [c for c in my_contours if cv.contourArea(c) == largest_area][0]
-    corners = cv.approxPolyDP(outside_contour,0.01*cv.arcLength(outside_contour,True),True)
+    sudoku_grid_contour = [c for c in my_contours if cv.contourArea(c) == largest_area][0]
 
-    ############## from grid corners to new grid corners after perspective rectification
-    corners=np.squeeze(corners)
-    # naming indexes accoring to how the coordinates of the points related to the other points
-    top_left_index = np.argmax([-sum(c) for c in corners])
-    bottom_right_index = np.argmax([sum(c) for c in corners])
-    bottom_left_index = np.argmax([c[1]-c[0] for c in corners])
-    top_right_index = np.argmax([c[0]-c[1] for c in corners])
+    test = cv.drawContours(img, sudoku_grid_contour, -1, (0,255,0),3)
+    # cv.imshow('contour grid',test)
+    # cv.waitKey(0)
+    ############## from grid vertices to new grid vertices applying perspective rectification
+    ###########################################################################################
+    vertices = cv.approxPolyDP(sudoku_grid_contour,0.01*cv.arcLength(sudoku_grid_contour,True),True)
+    vertices=np.squeeze(vertices)
+
+    ################# identifying_corners
+    top_left_index = np.argmax([-sum(c) for c in vertices])
+    bottom_right_index = np.argmax([sum(c) for c in vertices])
+    bottom_left_index = np.argmax([c[1]-c[0] for c in vertices])
+    top_right_index = np.argmax([c[0]-c[1] for c in vertices])
+    corners = np.array([vertices[top_left_index],\
+                    vertices[bottom_right_index],\
+                    vertices[bottom_left_index],\
+                    vertices[top_right_index]])
 
     min_x = min([c[0] for c in corners])
     min_y = min([c[1] for c in corners])
@@ -75,65 +100,67 @@ def scan_image(img):
 
     index_to_new_corner = {top_left_index:[min_x,min_y],\
                            bottom_right_index:[max_x, max_y],\
-                           top_right_index:[max_x,min_y],\
-                           bottom_left_index:[min_x, max_y]}
+                           bottom_left_index:[min_x, max_y],\
+                           top_right_index:[max_x,min_y]}
 
-    # cv.imshow(str(index_to_new_corner),thresh)
-    # cv.waitKey(0)
+    new_corners = np.array([index_to_new_corner[top_left_index],\
+                    index_to_new_corner[bottom_right_index],\
+                    index_to_new_corner[bottom_left_index],\
+                    index_to_new_corner[top_right_index]])
 
-    new_corners = np.array([index_to_new_corner[index] for index in range(len(corners))])
-    ##############
-
-    # find and apply homography to straighten the corners.
+    # find and apply homography to straighten the vertices.
     h, status = cv.findHomography(corners, new_corners)
-    new_perspective = cv.warpPerspective(img, h, img.shape[:2])
+    new_perspective = cv.warpPerspective(img, h, (img.shape[1],img.shape[0]))
+    cropped_grid = scaleImg(new_perspective[min_y:max_y,min_x:max_x], (grid_width,grid_height))
+    ###########################################################################################
 
-    cropped_img = scaleImg(new_perspective[min_y:max_y,min_x:max_x])
 
-    grid_width = 900
-    grid_height = 900
-    grid_area = grid_width*grid_height
-    rows = np.arange(0, 900, 100)
-    columns = np.arange(0, 900, 100)
 
     #find and predict digits in the new image
-    denoised = cv.fastNlMeansDenoisingColored(cropped_img,None,10,10,7,21)
+    denoised = cv.fastNlMeansDenoisingColored(cropped_grid,None,10,10,7,21)
     gray = cv.cvtColor(denoised, cv.COLOR_BGR2GRAY)
-    gaus = cv.GaussianBlur(gray, (5,5), 0).astype('uint8')
+    gaus = cv.GaussianBlur(gray, (11,11), 0).astype('uint8')
+
     thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
     my_contours_cropped, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    # cv.imshow('thresh2',thresh2)
-    # cv.waitKey(0)
+    max_area = np.max([cv.contourArea(c)  for c in my_contours_cropped if cv.contourArea(c) in area_range])
+    d = max_area.astype(int)//250
+    thresh3 = cv.morphologyEx(thresh2, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
+    my_contours_cropped, _ = cv.findContours(thresh3, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
+    filtered_cnt = [cnt for cnt in my_contours_cropped if int(cv.contourArea(cnt)) in area_range]
+    filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] in height_range and cv.boundingRect(c)[-2] in width_range and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>1.2 ]
+    max_h = np.max([cv.boundingRect(c)[-1]  for c in filtered_cnt if cv.contourArea(c) in area_range])
+    filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] > max_h*0.7]
 
-    area_range = list(range(200,2700))
-    height_range = list(range(30,90))
-    width_range = list(range(15,60))
-    # cv.imshow('thresh 2',thresh2)
+    centers = [[cv.boundingRect(cnt)[0]+cv.boundingRect(cnt)[-2]//2,cv.boundingRect(cnt)[1]+cv.boundingRect(cnt)[-1]//2] for cnt in filtered_cnt]
+    cells = list(set([find_cell(rows,columns,c) for c in centers]))
+    if(len(centers)>len(cells) or len(cells)<17): #if not many contours have been found try with inverse image
+        gaus = 255-gaus
+        thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
+        my_contours_cropped, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
+        max_area = np.max([cv.contourArea(c)  for c in my_contours_cropped if cv.contourArea(c) in area_range])
+        d = max_area.astype(int)//250
+        thresh3 = cv.morphologyEx(thresh2, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
+        filtered_cnt = [cnt for cnt in my_contours_cropped if int(cv.contourArea(cnt)) in area_range]
+        filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] in height_range and cv.boundingRect(c)[-2] in width_range and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>1.2 ]
+        max_h = np.max([cv.boundingRect(c)[-1]  for c in filtered_cnt if cv.contourArea(c) in area_range])
+        filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] > max_h*0.7]
+    # cv.imshow("final ",thresh3)
     # cv.waitKey(0)
-
-    mean = np.mean([cv.contourArea(c)  for c in my_contours_cropped if cv.contourArea(c) in area_range])
-    d = mean.astype(int)//100
-    thresh2 = cv.morphologyEx(thresh2, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
-    my_contours_cropped, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    # cv.imshow('thresh last',thresh2)
-    # cv.waitKey(0)
-
     predictor.load_model()
     sudoku_numbers = np.zeros((9,9), dtype=int)
-    for cnt in my_contours_cropped:
-        area = int(cv.contourArea(cnt))
-        if area in area_range:
-            [x,y,w,h] = cv.boundingRect(cnt)
-            if h in height_range and w in width_range and 4>h/w>1.2:
-                ctr = [x+w//2,y+h//2]
-                i,j = find_cell(rows, columns ,ctr)
-                digit = thresh2[y:y+h,x:x+w]
-                digit = pad_and_resize(digit,predictor.getIMSIZE())
-                predicted = predictor.predict([digit])
-                sudoku_numbers[i][j] = str(predicted[0])
-                # cv.imshow(str(predicted),digit)
-                # cv.waitKey(0)
+    for cnt in filtered_cnt:
+        [x,y,w,h] = cv.boundingRect(cnt)
+        ctr = [x+w//2,y+h//2]
+        (i,j) = find_cell(rows, columns ,ctr)
+        digit = thresh3[y:y+h,x:x+w]
+        digit = pad_and_resize(digit,predictor.getIMSIZE())
+        predicted = predictor.predict([digit])
+        sudoku_numbers[i][j] = str(predicted[0])
+        # cv.imshow(str((i,j)) + ' ' + str(predicted),digit)
+        # cv.waitKey(0)
     return sudoku_numbers
+
 
 def solve_sudoku(sudoku_numbers):
     asp_lines = []
