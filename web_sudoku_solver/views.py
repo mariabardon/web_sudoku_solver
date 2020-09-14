@@ -12,40 +12,56 @@ import io
 import re
 from PIL import Image
 from io import BytesIO
+from io import StringIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 import piexif
-global file_url
-file_url = os.path.join(settings.BASE_DIR,'static','media','pic.jpg')
+import boto3
 
 def index(request):
-    global file_url
     response = {}
     if  request.method == "POST":
         if 'solve' in request.POST:
-            numpy_image = cv.imread(file_url)
+            file_url = request.POST['solve']
+            path = file_url.split('cloudfront.net/')[1]
+
+
+            session = boto3.Session(
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            )
+            s3 = session.resource('s3')
+            bucket = s3.Bucket('web-sudoku-static')
+            object = bucket.Object(path)
+            file_stream = BytesIO()
+            file_stream.seek(0)
+            object.download_fileobj(file_stream)
+            numpy_image = np.asarray(Image.open(file_stream))
+
             original_numbers = mySudokuSolver.scan_image(numpy_image)
             solution = mySudokuSolver.solve_sudoku(original_numbers)
             z = zip(np.transpose(solution),np.transpose(original_numbers))
             response['img_url'] =  file_url
             response['original_numbers'] = np.dstack((np.transpose(solution),np.transpose(original_numbers)))
             response['solution'] =  solution
+
         elif 'right' in request.POST:
+            file_url = request.POST['right']
             file_url = rotate_and_save(file_url,-90)
             response['img_url'] =  file_url
         elif 'left' in request.POST:
+            file_url = request.POST['left']
             file_url = rotate_and_save(file_url,90)
             response['img_url'] =  file_url
         else:
-            clear_media_folder()
-            f = request.FILES['fileName'] # here you get the files needed
-            file_url = rotate_with_exif_and_save(f)
+            # clear_media_folder()
+            sudoku_image = request.FILES['fileName'] # here you get the files needed
+            file_url = rotate_with_exif_and_save(sudoku_image)
             response['img_url'] =  file_url
-
-        return render(request,'homepage.html',response)
+        return render(request,'web-sudoku-solver.html',response)
 
     else:
-        return render(request,'homepage.html')
+        return render(request,'web-sudoku-solver.html')
 
 def clear_media_folder():
     folder = os.path.join(settings.BASE_DIR,'static','media')
@@ -80,7 +96,7 @@ def save_image(image):
     except:
         image.save(outputIoStream, format='png')
     f = InMemoryUploadedFile(outputIoStream,'ImageField', file_name, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
-    clear_media_folder()
+    # clear_media_folder()
     file_name_2 = default_storage.save(file_name, f)
     file_url = default_storage.url(file_name_2)
     return file_url

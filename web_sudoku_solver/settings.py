@@ -4,7 +4,6 @@ import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -92,14 +92,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-
-STATIC_URL = '/static/'
-
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static','media')
-MEDIA_URL = 'static/media/'
-
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -116,9 +108,37 @@ TEMPLATES = [
     },
 ]
 
-STATICFILES_DIRS = [
-    STATIC_DIR,
-]
-django_heroku.settings(locals())
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+#
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'static','media')
+# MEDIA_URL = 'static/media/'
+#
+# STATIC_URL = '/static/'
+# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     STATIC_DIR,
+# ]
+# django_heroku.settings(locals())
+#
+
+
+#https://www.ordinarycoders.com/blog/article/serve-django-static-and-media-files-in-production
+AWS_ACCESS_KEY_ID = 'AKIAICHS3T3GUTKLIOUA'
+AWS_SECRET_ACCESS_KEY = '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'
+
+AWS_STORAGE_BUCKET_NAME = 'web-sudoku-static'
+AWS_S3_CUSTOM_DOMAIN = 'd22ohld22p4dfg.cloudfront.net'
+
+AWS_LOCATION = 'static'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+DEFAULT_FILE_STORAGE = 'web_sudoku_solver.storage_backends.MediaStorage'
+
+#https://github.com/heroku/django-heroku/issues/25
+django_heroku.settings(locals(), staticfiles=False)
