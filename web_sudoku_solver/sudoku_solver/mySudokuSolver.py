@@ -151,8 +151,7 @@ def scan_image(img):
         except Exception as e:
             raise Exception('Oops... Unable to find the grid of the sudoku. Please try again.')
         filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] > max_h*0.7]
-    cv.imshow("final ",thresh3)
-    cv.waitKey(0)
+
     predictor.load_model()
     sudoku_numbers = np.zeros((9,9), dtype=int)
     for cnt in filtered_cnt:
