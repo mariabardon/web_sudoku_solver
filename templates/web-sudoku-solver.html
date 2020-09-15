@@ -35,18 +35,21 @@
         <div class="container" align='center'>
           <label id='chooseButton' for="choose" class="btn">Upload Image</label>
           <input id="choose" name='fileName' style="visibility:hidden;font-size: 3vw;" type="file" value='image'>
-          {% if img_url  and not original_numbers.0.0.0%}
+          {% if error %}
+            <h1 style="font-size: 5vw;">{{error}}</h1>
+          {% endif %}
+          {% if temp_url  and not original_numbers.0.0.0%}
           <div class="row">
             <div class="column">
               <div class="column">
-                <button type="submit"  name='right' class="btn" value={{img_url}}> <i id='rotateIcon' class="fa fa-rotate-right"></i></button>
+                <button type="submit"  name='right' class="btn" value={{temp_url}}> <i id='rotateIcon' class="fa fa-rotate-right"></i></button>
               </div>
               <div class="column">
-                <button type="submit"  name='left' class="btn" value={{img_url}}> <i id='rotateIcon' class="fa fa-rotate-left"></i></button>
+                <button type="submit"  name='left' class="btn" value={{temp_url}}> <i id='rotateIcon' class="fa fa-rotate-left"></i></button>
               </div>
             </div>
             <div class="column">
-              <button id='solveButton' type="submit"  name='solve' value={{img_url}} class="btn">Solve</button>
+              <button id='solveButton' type="submit"  name='solve' value={{temp_url}} class="btn">Solve</button>
             </div>
           </div>
           {% endif %}
@@ -70,10 +73,11 @@
             </table>
           </div>
         {% endif %}
-        {% if img_url %}
+
         <div>
+        {% if temp_url %}
         <div>
-          <img src="{{img_url}}" class="w3-border"  style = "padding:4px;width:100%;margin-top: 15px;" >
+          <img src="{% static 'media/pic.jpg' %}" class="w3-border"  style = "padding:4px;width:100%;margin-top: 15px;" >
         </div>
         {% endif %}
         </div>

@@ -42,41 +42,11 @@ assignated_value(C) :- value(C,D).
 % display
 
 % value.
-value(cell(1,1),5).
-value(cell(1,4),8).
-value(cell(1,5),3).
-value(cell(1,7),2).
-value(cell(2,1),3).
-value(cell(2,3),4).
-value(cell(2,6),5).
-value(cell(3,4),7).
-value(cell(3,5),9).
-value(cell(3,6),1).
-value(cell(3,7),4).
-value(cell(4,2),5).
-value(cell(4,3),8).
-value(cell(4,4),4).
-value(cell(4,5),1).
-value(cell(4,8),9).
-value(cell(4,9),2).
-value(cell(5,3),3).
-value(cell(5,5),7).
-value(cell(5,7),1).
-value(cell(5,8),5).
-value(cell(5,9),8).
-value(cell(6,2),9).
-value(cell(6,5),8).
-value(cell(6,6),6).
-value(cell(7,1),6).
-value(cell(7,2),3).
-value(cell(7,3),5).
-value(cell(7,4),1).
-value(cell(8,4),3).
-value(cell(8,5),4).
-value(cell(8,6),7).
-value(cell(9,7),3).
-value(cell(9,8),8).
-value(cell(9,9),1).
+value(cell(3,1),1).
+value(cell(6,4),1).
+value(cell(7,2),1).
+value(cell(9,7),6).
+value(cell(9,8),1).
 %%%%%%%%%%%%
 display
 %%%%%%%%%%%%
