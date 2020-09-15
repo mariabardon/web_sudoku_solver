@@ -18,7 +18,7 @@ import sys
 import piexif
 import boto3
 import tempfile
-
+import uuid
 def index(request):
     response = {}
     if  request.method == "POST":
@@ -30,6 +30,7 @@ def index(request):
                 solution = mySudokuSolver.solve_sudoku(original_numbers)
             except Exception as e:
                 response['error'] = e
+                store_permanently(Image.open(temp_url))
                 return render(request,'web-sudoku-solver.html',response)
 
             z = zip(np.transpose(solution),np.transpose(original_numbers))
@@ -51,6 +52,7 @@ def index(request):
                 temp_url = rotate_with_exif_and_save(sudoku_image)
             except Exception as e:
                 response['error'] = e
+                store_permanently(sudoku_image)
                 return render(request,'web-sudoku-solver.html',response)
             response['temp_url'] =  temp_url
         return render(request,'web-sudoku-solver.html',response)
@@ -58,8 +60,7 @@ def index(request):
     else:
         return render(request,'web-sudoku-solver.html')
 
-def save_image(image):
-    s3_name = "pic.jpg"
+def save_image(image,s3_name = "pic.jpg"):
     outputIoStream = BytesIO()
     outputIoStream.seek(0)
     w,h = image.size
@@ -75,6 +76,12 @@ def save_image(image):
 
     default_storage.save(s3_name, f)
     return temp.name
+
+def store_permanently(image):
+    unique_filename = str(uuid.uuid4())
+    save_image(image, os.path.join('errors',unique_filename+'.jpg'))
+
+
 
 # https://piexif.readthedocs.io/en/latest/sample.html
 def rotate_with_exif_and_save(temp_url):
