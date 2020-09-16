@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta charset="utf-8">
+    <title>Sudoku Solver</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  </head>
+  <body>
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-light" >
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar-collapse-1" aria-controls="navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button> -->
+    <nav class="navbar navbar-expand-sm navbar-light bg-faded">
+      <div class="logo">
+        <img src="{% static 'media/my_logo/RocioGomez.png' %}" style="width: 30vw;padding:4px;margin: 15px;">
+      </div>
+      <div class="social-links row">
+          <a href="https://github.com/Rociogomezbardon" class="fa fa-github"></a>
+          <a href="https://www.linkedin.com/in/rocio-gomez-bardon/" class="fa fa-linkedin"></a>
+          <a href="mailto:rociogomezbardon@gmail.com" class="fa fa-envelope-o"> </a>
+      </div>
+
+    </nav>
+    <div class="container" align='center' style="width: 60%; margin: auto;">
+    <!-- <div class="container" align='center' style="max-width: 400px; margin: auto;"> -->
+      <h1 style="font-size: 5vw;">My Sudoku Solver</h1>
+      <!-- <p class="lead">Upload an image of an empty sudoku and I will solve it for you</p> -->
+      <form method="post" class="md-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container" align='center'>
+          <label id='chooseButton' for="choose" class="btn">Upload Image</label>
+          <input id="choose" name='fileName' style="visibility:hidden;font-size: 3vw;" type="file" value='image'>
+          {% if error %}
+            <h1 style="font-size: 5vw;">{{error}}</h1>
+          {% endif %}
+          {% if temp_url  and not original_numbers.0.0.0%}
+          <div class="row">
+            <div class="column">
+              <div class="column">
+                <button type="submit"  name='right' class="btn" value={{temp_url}}> <i id='rotateIcon' class="fa fa-rotate-right"></i></button>
+              </div>
+              <div class="column">
+                <button type="submit"  name='left' class="btn" value={{temp_url}}> <i id='rotateIcon' class="fa fa-rotate-left"></i></button>
+              </div>
+            </div>
+            <div class="column">
+              <button id='solveButton' type="submit"  name='solve' value={{temp_url}} class="btn">Solve</button>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% if original_numbers.0.0.0 %}
+          <div style= "margin-top:0px; margin-bottom:0px;">
+            <table >
+              {% for original_numbers_row in original_numbers %}
+              <tr>
+                  {% for s in original_numbers_row %}
+                  <td>
+                    {% if s.1 == 0 %} <font style="color: red;" class='solved'>
+                    {% else %} <font style="color: black;">
+                    {% endif %}
+                    {{s.0}}
+                  </font>
+                  </td>
+                  {% endfor %}
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% endif %}
+
+        <div>
+        {% if temp_url %}
+        <div>
+          <img src="{% static 'media/pic.jpg' %}" class="w3-border"  style = "padding:4px;width:100%;margin-top: 15px;" >
+        </div>
+        {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <!-- Need to have JQuery and Javascript for DropDown Actions to work -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/web-sudoku-solver.js' %}?version=1"></script>
+    <link rel="stylesheet" href= "{% static  'css/web-sudoku-solver.css' %}?version=1">
+  </body>
+</html>

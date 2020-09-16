@@ -1,9 +1,8 @@
 import cv2 as cv
 import numpy as np
-import re
 from .digit_predictor import Predictor as predictor
 from .solver_files import ASP_interface
-import sys
+
 
 def pad_and_resize(digit,imsize):
     (w,h) = digit.shape
@@ -75,7 +74,7 @@ def scan_image(img):
     largest_area = max([cv.contourArea(c) for c in my_contours])
     sudoku_grid_contour = [c for c in my_contours if cv.contourArea(c) == largest_area][0]
 
-    test = cv.drawContours(img, sudoku_grid_contour, -1, (0,255,0),3)
+    # test = cv.drawContours(img, sudoku_grid_contour, -1, (0,255,0),3)
     # cv.imshow('contour grid',test)
     # cv.waitKey(0)
     ############## from grid vertices to new grid vertices applying perspective rectification
@@ -128,10 +127,13 @@ def scan_image(img):
     thresh3 = cv.morphologyEx(thresh2, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
     my_contours_cropped, _ = cv.findContours(thresh3, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
     filtered_cnt = [cnt for cnt in my_contours_cropped if int(cv.contourArea(cnt)) in area_range]
-    filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] in height_range and cv.boundingRect(c)[-2] in width_range and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>1.2 ]
-    max_h = np.max([cv.boundingRect(c)[-1]  for c in filtered_cnt if cv.contourArea(c) in area_range])
-    filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] > max_h*0.7]
 
+    filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] in height_range and cv.boundingRect(c)[-2] in width_range and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>1.2 ]
+    try:
+        max_h = np.max([cv.boundingRect(c)[-1]  for c in filtered_cnt if cv.contourArea(c) in area_range])
+    except Exception as e:
+        raise Exception('Oops... Unable to find the grid of the sudoku. Please try again.')
+    filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] > max_h*0.7]
     centers = [[cv.boundingRect(cnt)[0]+cv.boundingRect(cnt)[-2]//2,cv.boundingRect(cnt)[1]+cv.boundingRect(cnt)[-1]//2] for cnt in filtered_cnt]
     cells = list(set([find_cell(rows,columns,c) for c in centers]))
     if(len(centers)>len(cells) or len(cells)<17): #if not many contours have been found try with inverse image
@@ -143,10 +145,12 @@ def scan_image(img):
         thresh3 = cv.morphologyEx(thresh2, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
         filtered_cnt = [cnt for cnt in my_contours_cropped if int(cv.contourArea(cnt)) in area_range]
         filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] in height_range and cv.boundingRect(c)[-2] in width_range and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>1.2 ]
-        max_h = np.max([cv.boundingRect(c)[-1]  for c in filtered_cnt if cv.contourArea(c) in area_range])
+        try:
+            max_h = np.max([cv.boundingRect(c)[-1]  for c in filtered_cnt if cv.contourArea(c) in area_range])
+        except Exception as e:
+            raise Exception('Oops... Unable to find the grid of the sudoku. Please try again.')
         filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] > max_h*0.7]
-    # cv.imshow("final ",thresh3)
-    # cv.waitKey(0)
+
     predictor.load_model()
     sudoku_numbers = np.zeros((9,9), dtype=int)
     for cnt in filtered_cnt:
@@ -172,13 +176,12 @@ def solve_sudoku(sudoku_numbers):
     solution_matrix = np.zeros((9,9), dtype=int)
     solution_matrix[sudoku_numbers!=0] = sudoku_numbers[sudoku_numbers!=0]
 
-
+    print('solving it')
     try:
         solution = ASP_interface.solve(asp_lines)
     except RuntimeError as err:
-        print('RuntimeError')
-        print(err)
-        solution = ''
+        raise RuntimeError('Oops... Unable to find all digits in this sudoku. It may be rotated or unfocused. Please try again.')
+
 
     for e in solution:
         #i and j go from 0 to 8, but answer goes from 1 to 9

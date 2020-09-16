@@ -1,93 +1,89 @@
-import os, shutil
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.conf import settings
-import numpy as np
-import cv2 as cv
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponse
 from .sudoku_solver import mySudokuSolver
-import io
-import re
 from PIL import Image
 from io import BytesIO
-from django.core.files.uploadedfile import InMemoryUploadedFile
-import sys
-import piexif
-global file_url
-file_url = os.path.join(settings.BASE_DIR,'static','media','pic.jpg')
+import os, shutil, sys, piexif, tempfile, uuid
+import numpy as np
+import cv2 as cv
+
 
 def index(request):
-    global file_url
     response = {}
     if  request.method == "POST":
         if 'solve' in request.POST:
-            numpy_image = cv.imread(file_url)
-            original_numbers = mySudokuSolver.scan_image(numpy_image)
-            solution = mySudokuSolver.solve_sudoku(original_numbers)
+            temp_url = request.POST['solve']
+            numpy_image = cv.imread(temp_url)
+            try:
+                original_numbers = mySudokuSolver.scan_image(numpy_image)
+                solution = mySudokuSolver.solve_sudoku(original_numbers)
+            except Exception as e:
+                response['error'] = e
+                store_permanently(Image.open(temp_url))
+                return render(request,'web-sudoku-solver.html',response)
+
             z = zip(np.transpose(solution),np.transpose(original_numbers))
-            response['img_url'] =  file_url
+            response['temp_url'] =  temp_url
             response['original_numbers'] = np.dstack((np.transpose(solution),np.transpose(original_numbers)))
             response['solution'] =  solution
-        elif 'right' in request.POST:
-            file_url = rotate_and_save(file_url,-90)
-            response['img_url'] =  file_url
-        elif 'left' in request.POST:
-            file_url = rotate_and_save(file_url,90)
-            response['img_url'] =  file_url
-        else:
-            clear_media_folder()
-            f = request.FILES['fileName'] # here you get the files needed
-            file_url = rotate_with_exif_and_save(f)
-            response['img_url'] =  file_url
 
-        return render(request,'homepage.html',response)
+        elif 'right' in request.POST:
+            temp_url = request.POST['right']
+            temp_url = rotate_and_save(temp_url,-90)
+            response['temp_url'] =  temp_url
+        elif 'left' in request.POST:
+            temp_url = request.POST['left']
+            temp_url = rotate_and_save(temp_url,90)
+            response['temp_url'] =  temp_url
+        else:
+            sudoku_image = request.FILES['fileName'] # here you get the files needed
+            try:
+                temp_url = rotate_with_exif_and_save(sudoku_image)
+            except Exception as e:
+                response['error'] = e
+                store_permanently(sudoku_image)
+                return render(request,'web-sudoku-solver.html',response)
+            response['temp_url'] =  temp_url
+        return render(request,'web-sudoku-solver.html',response)
 
     else:
-        return render(request,'homepage.html')
+        return render(request,'web-sudoku-solver.html')
 
-def clear_media_folder():
-    folder = os.path.join(settings.BASE_DIR,'static','media')
-    for filename in [f for f in os.listdir(folder) if 'my_logo' not in f]:
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
-    folder= os.path.join(settings.BASE_DIR,'staticfiles','media')
-    for filename in [f for f in os.listdir(folder) if 'my_logo' not in f]:
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-def save_image(image):
-    file_name = "pic.jpg"
+def save_image(image,s3_name = "pic.jpg"):
     outputIoStream = BytesIO()
     outputIoStream.seek(0)
     w,h = image.size
     image = image.resize((500,500*h//w))
-    try:
-        image.save(outputIoStream , format='JPEG')
-    except:
-        image.save(outputIoStream, format='png')
-    f = InMemoryUploadedFile(outputIoStream,'ImageField', file_name, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
-    clear_media_folder()
-    file_name_2 = default_storage.save(file_name, f)
-    file_url = default_storage.url(file_name_2)
-    return file_url
+    image.save(outputIoStream , format='JPEG')
+
+    f = InMemoryUploadedFile(outputIoStream,'ImageField', s3_name, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
+    temp = tempfile.NamedTemporaryFile(delete=False)
+
+    with open(temp.name, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+    default_storage.save(s3_name, f)
+    return temp.name
+
+def store_permanently(image):
+    unique_filename = str(uuid.uuid4())
+    save_image(image, os.path.join('errors',unique_filename+'.jpg'))
+
+
 
 # https://piexif.readthedocs.io/en/latest/sample.html
-def rotate_with_exif_and_save(filename):
-    img = Image.open(filename)
+def rotate_with_exif_and_save(temp_url):
+    try:
+        img = Image.open(temp_url)
+    except:
+        raise Exception("Oops... This file is not an image. Please try again.")
+
     if "exif" in img.info:
         exif_dict = piexif.load(img.info["exif"])
         if piexif.ImageIFD.Orientation in exif_dict["0th"]:
@@ -110,8 +106,8 @@ def rotate_with_exif_and_save(filename):
     return save_image(img)
 
 
-def rotate_and_save(file_url,d):
-    img = Image.open(file_url)
+def rotate_and_save(temp_url,d):
+    img = Image.open(temp_url)
     img = img.rotate(d, expand=True)
-    file_url = save_image(img)
-    return file_url
+    temp_url = save_image(img)
+    return temp_url
