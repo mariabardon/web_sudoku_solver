@@ -13,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -120,9 +120,11 @@ TEMPLATES = [
 #
 
 #https://www.ordinarycoders.com/blog/article/serve-django-static-and-media-files-in-production
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_ACCESS_KEY_ID']
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+
 AWS_STORAGE_BUCKET_NAME = 'web-sudoku-static'
 AWS_S3_CUSTOM_DOMAIN = 'd22ohld22p4dfg.cloudfront.net'
 
