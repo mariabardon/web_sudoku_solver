@@ -1,18 +1,24 @@
+import os, shutil
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.conf import settings
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.http import HttpResponse
-from .sudoku_solver import mySudokuSolver
-from PIL import Image
-from io import BytesIO
-import os, shutil, sys, piexif, tempfile, uuid
 import numpy as np
 import cv2 as cv
-
-
+from django.http import HttpResponse
+from .sudoku_solver import mySudokuSolver
+import io
+import re
+from PIL import Image
+from io import BytesIO
+from io import StringIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+import piexif
+import boto3
+import tempfile
+import uuid
 def index(request):
     response = {}
     if  request.method == "POST":
