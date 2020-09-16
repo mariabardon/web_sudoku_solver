@@ -1,9 +1,4 @@
-import subprocess
-import os
-import stat
-import sys
-from pathlib import Path
-import time
+import subprocess, os, stat, sys, time
 
 solverDir = os.path.dirname(os.path.abspath(__file__))
 sparcPath = os.path.join(solverDir,"sparc.jar")
