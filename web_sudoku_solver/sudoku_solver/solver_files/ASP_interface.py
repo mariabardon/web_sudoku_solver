@@ -6,9 +6,7 @@ from pathlib import Path
 import time
 
 solverDir = os.path.dirname(os.path.abspath(__file__))
-clingoPath = os.path.join(solverDir,"clingo")
 sparcPath = os.path.join(solverDir,"sparc.jar")
-outputPath = os.path.join(solverDir,'output.txt')
 def solve(aspLines):
     aspLines = aspLines + ['%%%%%%%%%%%%', 'display', '%%%%%%%%%%%%', 'value.']
     f=open(os.path.join(solverDir,"sudokuSolver_sample.sp"), "r+")
@@ -23,7 +21,6 @@ def solve(aspLines):
     st = os.stat(sparcPath)
     os.chmod(sparcPath, st.st_mode | stat.S_IEXEC)
 
-    # os.popen(' '.join(['java','-jar', sparcPath, mySolverPath, '-A >', outputPath]))
     pipe = subprocess.Popen(['java','-jar', sparcPath, mySolverPath, '-A'], stdout=subprocess.PIPE)
     try:
         wait_timeout(pipe, 5)
