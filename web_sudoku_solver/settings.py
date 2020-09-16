@@ -10,10 +10,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fi+xd04cg1_)fpzl8)+(w1y(ml@=4b3k$@xhzaij+#%gg_(=+a'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False 
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -119,11 +119,10 @@ TEMPLATES = [
 # django_heroku.settings(locals())
 #
 
-
 #https://www.ordinarycoders.com/blog/article/serve-django-static-and-media-files-in-production
-AWS_ACCESS_KEY_ID = 'AKIA4NB55MASN7I5NZWM'
-AWS_SECRET_ACCESS_KEY = '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'
-
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = 'web-sudoku-static'
 AWS_S3_CUSTOM_DOMAIN = 'd22ohld22p4dfg.cloudfront.net'
 
