@@ -3,7 +3,7 @@
 This is a repository for the code used for this application: [sudoku.rociogomez.com](sudoku.rociogomez.com)
 
 
-The application will let you upload an image of a sudoku that has not been completed, and it will give you a solution of the sudoku.
+The application will let you upload an image of a sudoku that has not been completed, and it will solve it for you.
 
 The code here is the exact same code I push in the heroku repo when I deploy it.
 
