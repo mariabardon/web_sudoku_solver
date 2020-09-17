@@ -8,8 +8,6 @@ import sys, piexif, tempfile, uuid
 import numpy as np
 import cv2 as cv
 
-
-
 def index(request):
     response = {}
     if  request.method == "POST":
@@ -72,8 +70,6 @@ def store_permanently(image):
     unique_filename = str(uuid.uuid4())
     save_image(image, os.path.join('errors',unique_filename+'.jpg'))
 
-
-
 # https://piexif.readthedocs.io/en/latest/sample.html
 def rotate_with_exif_and_save(temp_url):
     try:
@@ -101,7 +97,6 @@ def rotate_with_exif_and_save(temp_url):
             elif orientation == 8:
                 img = img.rotate(90, expand=True)
     return save_image(img)
-
 
 def rotate_and_save(temp_url,d):
     img = Image.open(temp_url)

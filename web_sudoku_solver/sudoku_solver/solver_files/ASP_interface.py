@@ -11,8 +11,6 @@ def solve(aspLines):
     f=open(mySolverPath,'w+')
     f.write(content + '\n'.join(aspLines))
     f.close()
-
-
     st = os.stat(sparcPath)
     os.chmod(sparcPath, st.st_mode | stat.S_IEXEC)
 
@@ -22,11 +20,9 @@ def solve(aspLines):
     except RuntimeError as e:
         raise e
 
-
-
     answerSet = pipe.stdout.read().decode('utf-8')
-    # sys.stdout.write('answerSet')
-    # sys.stdout.write(answerSet)
+    sys.stdout.write('answerSet')
+    sys.stdout.write(answerSet)
     chosenAnswer = answerSet.strip().split('\n\n')[0]
     entries = chosenAnswer.strip('{}').split(', ')
     return entries

@@ -1,17 +1,13 @@
 import torch
-from .train import model
+from .model import model
 import cv2
 import numpy as np
 import torch.nn as nn
-
-
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 global predictor
-
-
 def load_model(modelpath = 'digit_predictor/best_model.pth'):
     global predictor
     modelpath = os.path.join(BASE_DIR,modelpath)
@@ -26,14 +22,10 @@ def getIMSIZE():
     return model.IMSIZE
 
 def predict(imgs):
-    #if my_model is None: load_model()
     imgs = np.expand_dims(imgs,1)
     if(np.max(imgs) > 1): imgs = imgs/255
     tensor_imgs = torch.tensor(np.array(imgs)).float()
     tensor_output = predictor(tensor_imgs)
     output = nn.functional.softmax(tensor_output,1)
     prediction = [np.argmax(output.detach().numpy())+1 for o in output]
-    # prediction = [np.argmax(tensor_output.detach().numpy())+1 for o in tensor_output]
-    # print(output)
-    # print(max(output.detach().numpy()))
     return(prediction)

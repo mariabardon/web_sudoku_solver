@@ -26,25 +26,6 @@ def find_cell(x_array, y_array ,c):
     j = max([j for j,y_coor in enumerate(y_array) if y_coor < y])
     return (i,j)
 
-def get_cells_centers(rows,columns):
-    arr = []
-    for i,r in enumerate(rows[:-1]):
-        for j,c in enumerate(columns[:-1]):
-            arr.append((rows[i] + (rows[i+1]-rows[i])//2,columns[j]+(columns[j+1]-columns[j])//2))
-    return arr
-
-def get_cell_center(r,c):
-    x = rows[r] + (rows[r+1]-rows[r])//2
-    y = columns[c] + (columns[c+1]-columns[c])//2
-    return (x,y)
-
-def get_contour_center(c):
-    M = cv.moments(c)
-    cX = int(M["m10"] / M["m00"])
-    cY = int(M["m01"] / M["m00"])
-    return(cX,cY)
-
-
 def scan_image(img):
     area_range = list(range(150,2700))
     height_range = list(range(30,90))
@@ -111,8 +92,6 @@ def scan_image(img):
     new_perspective = cv.warpPerspective(img, h, (img.shape[1],img.shape[0]))
     cropped_grid = scaleImg(new_perspective[min_y:max_y,min_x:max_x], (grid_width,grid_height))
     ###########################################################################################
-
-
 
     #find and predict digits in the new image
     denoised = cv.fastNlMeansDenoisingColored(cropped_grid,None,10,10,7,21)
@@ -181,17 +160,9 @@ def solve_sudoku(sudoku_numbers):
     except RuntimeError as err:
         raise RuntimeError('Oops... Unable to find all digits in this sudoku. It may be rotated or unfocused. Please try again.')
 
-
     for e in solution:
         #i and j go from 0 to 8, but answer goes from 1 to 9
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )
         solution_matrix[i][j]=digit
 
-    # print(np.transpose(solution_matrix))
     return solution_matrix, sudoku_numbers
-
-
-if __name__ == "__main__":
-    img_name = 'sudoku_images/IMG-0997.JPG'    #+input('image name\n')
-    img = cv.imread(img_name)
-    solve_this(img)

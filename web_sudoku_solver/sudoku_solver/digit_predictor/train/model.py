@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 ## This model gets images as arrays of one dimension of length IMSIZE*IMSIZE
-# it classifies 9 different classes. 
+# it classifies 9 different classes.
 global IMSIZE
 IMSIZE = 56
 class CNNet(nn.Module):
@@ -17,7 +17,7 @@ class CNNet(nn.Module):
         self.conv4 = nn.Conv2d(64, 64, 3, padding=1)
 
         # input IMSIZE/4 x IMSIZE/4 x 64
-       
+
         self.fc1 = nn.Linear((IMSIZE**2)*4, 1024)
         self.fc2 = nn.Linear(1024, 9)
 
@@ -37,5 +37,4 @@ class CNNet(nn.Module):
         x = F.relu(x)
         x = self.dropout(x)
         x = self.fc2(x)
-        #x = self.softmax(x)
         return x
