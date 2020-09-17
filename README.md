@@ -5,10 +5,6 @@ This is a repository for the code used for this application: sudoku.rociogomez.c
 
 The application will let you upload an image of a sudoku that has not been completed, and it will give you a solution of the sudoku.
 
-For building this application I used four differnt parts:
+The code here is the exact same code I push in the heroku repo when I deploy it.
 
-1.  A function that processes an image, finds the sudoku grid in the image and exctracts the digits within the grid.
-2.  Building and training a CNN model that predicts digits.
-3.  An answer set program that solves the sudoku given the predicted digits, and their location in the grid.
-4.  A Django web application constructed using the parts above.  
-5.  Deploying the Django app in heroku. [Steps here](readme_links/deploying.md)
+If you want to know how I built it, please look at my [wiki]https://github.com/Rociogomezbardon/web_sudoku_solver/wiki) page.
