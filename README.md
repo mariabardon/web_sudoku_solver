@@ -7,4 +7,4 @@ The application will let you upload an image of a sudoku that has not been compl
 
 The code here is the exact same code I push in the heroku repo when I deploy it.
 
-If you want to know how I built it, please look at my [wiki]https://github.com/Rociogomezbardon/web_sudoku_solver/wiki) page.
+If you want to know how I built it, please look at my [wiki](https://github.com/Rociogomezbardon/web_sudoku_solver/wiki) page.
