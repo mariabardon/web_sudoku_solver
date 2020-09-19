@@ -15,7 +15,6 @@ class CNNet(nn.Module):
         self.conv3 = nn.Conv2d(32, 64, 3, padding=1)
         # input IMSIZE/2 x IMSIZE/2 x 64
         self.conv4 = nn.Conv2d(64, 64, 3, padding=1)
-
         # input IMSIZE/4 x IMSIZE/4 x 64
 
         self.fc1 = nn.Linear((IMSIZE**2)*4, 1024)

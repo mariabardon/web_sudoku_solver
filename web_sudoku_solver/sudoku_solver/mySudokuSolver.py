@@ -93,6 +93,9 @@ def scan_image(img):
     cropped_grid = scaleImg(new_perspective[min_y:max_y,min_x:max_x], (grid_width,grid_height))
     ###########################################################################################
 
+    # cv.imshow('cropped_grid',cropped_grid)
+    # cv.waitKey(0)
+
     #find and predict digits in the new image
     denoised = cv.fastNlMeansDenoisingColored(cropped_grid,None,10,10,7,21)
     gray = cv.cvtColor(denoised, cv.COLOR_BGR2GRAY)

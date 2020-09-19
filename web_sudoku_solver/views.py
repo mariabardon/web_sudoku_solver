@@ -36,12 +36,12 @@ def index(request):
             temp_url = rotate_and_save(temp_url,90)
             response['temp_url'] =  temp_url
         else:
-            sudoku_image = request.FILES['fileName'] # here you get the files needed
+            origin_url = request.FILES['fileName'] # here you get the files needed
             try:
-                temp_url = rotate_with_exif_and_save(sudoku_image)
+                temp_url = rotate_with_exif_and_save(origin_url)
             except Exception as e:
                 response['error'] = e
-                store_permanently(sudoku_image)
+                store_permanently(origin_url)
                 return render(request,'web-sudoku-solver.html',response)
             response['temp_url'] =  temp_url
         return render(request,'web-sudoku-solver.html',response)
@@ -71,9 +71,9 @@ def store_permanently(image):
     save_image(image, os.path.join('errors',unique_filename+'.jpg'))
 
 # https://piexif.readthedocs.io/en/latest/sample.html
-def rotate_with_exif_and_save(temp_url):
+def rotate_with_exif_and_save(img_url):
     try:
-        img = Image.open(temp_url)
+        img = Image.open(img_url)
     except:
         raise Exception("Oops... This file is not an image. Please try again.")
 
@@ -96,6 +96,7 @@ def rotate_with_exif_and_save(temp_url):
                 img = img.rotate(90, expand=True).transpose(Image.FLIP_LEFT_RIGHT)
             elif orientation == 8:
                 img = img.rotate(90, expand=True)
+        
     return save_image(img)
 
 def rotate_and_save(temp_url,d):
