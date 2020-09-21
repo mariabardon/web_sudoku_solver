@@ -1,6 +1,6 @@
 ## Sudoku Solver
 
-This is a repository for the code used for this application: [hhtp://sudoku.rociogomez.com](sudoku.rociogomez.com)
+This is a repository for the code used for this application: [sudoku.rociogomez.com](http://sudoku.rociogomez.com)
 
 
 The application will let you upload an image of a sudoku that has not been completed, and it will solve it for you.
