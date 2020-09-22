@@ -40,9 +40,9 @@ def scan_image(img):
     dim = (2000*s[1]//s[0],2000)
     # dim = (900,900)
     img = scaleImg(img,dim)
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    gaus = cv.GaussianBlur(gray, (9,9), 0)
-    thresh = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
+    thresh = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    thresh = cv.GaussianBlur(thresh, (9,9), 0)
+    thresh = cv.adaptiveThreshold(thresh, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
     p = 4
     thresh = cv.morphologyEx(thresh, cv.MORPH_CLOSE, kernel=np.ones((p,p),np.uint8))
     my_contours, _ = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[-2:]
@@ -97,16 +97,16 @@ def scan_image(img):
     # cv.waitKey(0)
 
     #find and predict digits in the new image
-    denoised = cv.fastNlMeansDenoisingColored(cropped_grid,None,10,10,7,21)
-    gray = cv.cvtColor(denoised, cv.COLOR_BGR2GRAY)
-    gaus = cv.GaussianBlur(gray, (11,11), 0).astype('uint8')
+    thresh = cv.fastNlMeansDenoisingColored(cropped_grid,None,10,10,7,21)
+    thresh = cv.cvtColor(thresh, cv.COLOR_BGR2GRAY)
+    thresh = cv.GaussianBlur(thresh, (11,11), 0).astype('uint8')
 
-    thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
-    my_contours_cropped, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
+    thresh = cv.adaptiveThreshold(thresh, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
+    my_contours_cropped, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
     max_area = np.max([cv.contourArea(c)  for c in my_contours_cropped if cv.contourArea(c) in area_range])
     d = max_area.astype(int)//250
-    thresh3 = cv.morphologyEx(thresh2, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
-    my_contours_cropped, _ = cv.findContours(thresh3, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
+    thresh = cv.morphologyEx(thresh, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
+    my_contours_cropped, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
     filtered_cnt = [cnt for cnt in my_contours_cropped if int(cv.contourArea(cnt)) in area_range]
 
     filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] in height_range and cv.boundingRect(c)[-2] in width_range and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>1.2 ]
@@ -118,12 +118,14 @@ def scan_image(img):
     centers = [[cv.boundingRect(cnt)[0]+cv.boundingRect(cnt)[-2]//2,cv.boundingRect(cnt)[1]+cv.boundingRect(cnt)[-1]//2] for cnt in filtered_cnt]
     cells = list(set([find_cell(rows,columns,c) for c in centers]))
     if(len(centers)>len(cells) or len(cells)<17): #if not many contours have been found try with inverse image
-        gaus = 255-gaus
-        thresh2 = cv.adaptiveThreshold(gaus, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
-        my_contours_cropped, _ = cv.findContours(thresh2, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
+        thresh = cv.fastNlMeansDenoisingColored(cropped_grid,None,10,10,7,21)
+        thresh = cv.cvtColor(thresh, cv.COLOR_BGR2GRAY)
+        thresh = 255-cv.GaussianBlur(thresh, (11,11), 0).astype('uint8')
+        thresh = cv.adaptiveThreshold(thresh, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
+        my_contours_cropped, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
         max_area = np.max([cv.contourArea(c)  for c in my_contours_cropped if cv.contourArea(c) in area_range])
         d = max_area.astype(int)//250
-        thresh3 = cv.morphologyEx(thresh2, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
+        thresh = cv.morphologyEx(thresh, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
         filtered_cnt = [cnt for cnt in my_contours_cropped if int(cv.contourArea(cnt)) in area_range]
         filtered_cnt = [c for c in filtered_cnt if cv.boundingRect(c)[-1] in height_range and cv.boundingRect(c)[-2] in width_range and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>1.2 ]
         try:
@@ -138,7 +140,7 @@ def scan_image(img):
         [x,y,w,h] = cv.boundingRect(cnt)
         ctr = [x+w//2,y+h//2]
         (i,j) = find_cell(rows, columns ,ctr)
-        digit = thresh3[y:y+h,x:x+w]
+        digit = thresh[y:y+h,x:x+w]
         digit = pad_and_resize(digit,predictor.getIMSIZE())
         predicted = predictor.predict([digit])
         sudoku_numbers[i][j] = str(predicted[0])
