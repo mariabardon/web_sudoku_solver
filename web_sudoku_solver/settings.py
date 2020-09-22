@@ -112,7 +112,7 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static','media')
 MEDIA_URL = 'static/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
