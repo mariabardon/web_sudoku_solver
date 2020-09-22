@@ -4,7 +4,7 @@ from django.shortcuts import render
 from .sudoku_solver import mySudokuSolver
 from PIL import Image
 from io import BytesIO
-import sys, piexif, tempfile, uuid
+import sys, piexif, tempfile, uuid, os
 import numpy as np
 import cv2 as cv
 
@@ -63,6 +63,8 @@ def save_image(image,s3_name = "pic.jpg"):
         for chunk in f.chunks():
             destination.write(chunk)
 
+    if default_storage.exists(s3_name):
+        default_storage.delete(s3_name)
     default_storage.save(s3_name, f)
     return temp.name
 
@@ -96,7 +98,7 @@ def rotate_with_exif_and_save(img_url):
                 img = img.rotate(90, expand=True).transpose(Image.FLIP_LEFT_RIGHT)
             elif orientation == 8:
                 img = img.rotate(90, expand=True)
-        
+
     return save_image(img)
 
 def rotate_and_save(temp_url,d):
