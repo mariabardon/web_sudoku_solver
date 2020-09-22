@@ -41,7 +41,7 @@ def index(request):
                 temp_url = rotate_with_exif_and_save(origin_url)
             except Exception as e:
                 response['error'] = e
-                store_permanently(origin_url)
+                #store_permanently(origin_url)
                 return render(request,'web-sudoku-solver.html',response)
             response['temp_url'] =  temp_url
         return render(request,'web-sudoku-solver.html',response)
