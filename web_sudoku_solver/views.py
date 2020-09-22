@@ -54,7 +54,10 @@ def save_image(image,s3_name = "pic.jpg"):
     outputIoStream.seek(0)
     w,h = image.size
     image = image.resize((500,500*h//w))
-    image.save(outputIoStream , format='JPEG')
+    try:
+        image.save(outputIoStream , format='JPEG')
+    except:
+        image.save(outputIoStream , format='PNG')
 
     f = InMemoryUploadedFile(outputIoStream,'ImageField', s3_name, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
     temp = tempfile.NamedTemporaryFile(delete=False)
