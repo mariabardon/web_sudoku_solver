@@ -165,6 +165,9 @@ def solve_sudoku(sudoku_numbers):
     except RuntimeError as err:
         raise RuntimeError('Oops... Unable to find all digits in this sudoku. It may be rotated or unfocused. Please try again.')
 
+    if solution == ['']:
+        raise Exception('Oops... I cannot see well the sudoku grid in the image')
+
     for e in solution:
         #i and j go from 0 to 8, but answer goes from 1 to 9
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )
