@@ -19,37 +19,44 @@ def index(request):
                 solution = mySudokuSolver.solve_sudoku(original_numbers)
             except Exception as e:
                 response['error'] = e
-                store_permanently(Image.open(temp_url))
+                upload_as_error(Image.open(temp_url))
                 return render(request,'web-sudoku-solver.html',response)
 
             z = zip(np.transpose(solution),np.transpose(original_numbers))
             response['temp_url'] =  temp_url
             response['original_numbers'] = np.dstack((np.transpose(solution),np.transpose(original_numbers)))
             response['solution'] =  solution
+            response['s3_url'] = s3_url = temp_to_s3_name(temp_url)
 
         elif 'right' in request.POST:
             temp_url = request.POST['right']
-            temp_url = rotate_and_save(temp_url,-90)
+            s3_url, temp_url = rotate_and_save(temp_url,-90)
             response['temp_url'] =  temp_url
+            response['s3_url'] = s3_url
         elif 'left' in request.POST:
             temp_url = request.POST['left']
-            temp_url = rotate_and_save(temp_url,90)
+            s3_url, temp_url = rotate_and_save(temp_url,90)
             response['temp_url'] =  temp_url
+            response['s3_url'] = s3_url
         else:
             origin_url = request.FILES['fileName'] # here you get the files needed
+            s3_url, temp_url = rotate_with_exif_and_save(origin_url)
+
             try:
-                temp_url = rotate_with_exif_and_save(origin_url)
+                s3_url, temp_url = rotate_with_exif_and_save(origin_url)
+
             except Exception as e:
                 response['error'] = e
-                store_permanently(origin_url)
+                upload_as_error(origin_url)
                 return render(request,'web-sudoku-solver.html',response)
             response['temp_url'] =  temp_url
+            response['s3_url'] = s3_url
         return render(request,'web-sudoku-solver.html',response)
 
     else:
         return render(request,'web-sudoku-solver.html')
 
-def save_image(image,s3_name = "pic.jpg"):
+def save_image(image):
     outputIoStream = BytesIO()
     outputIoStream.seek(0)
     w,h = image.size
@@ -58,23 +65,26 @@ def save_image(image,s3_name = "pic.jpg"):
         image.save(outputIoStream , format='JPEG')
     except:
         image.save(outputIoStream , format='PNG')
-
-    f = InMemoryUploadedFile(outputIoStream,'ImageField', s3_name, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
     temp = tempfile.NamedTemporaryFile(delete=False)
+    # unique_filename = str(uuid.uuid4())
+    # s3_url = os.path.join('uploads',unique_filename+'.jpg')
+    s3_url = temp_to_s3_name(temp.name)
+    f = InMemoryUploadedFile(outputIoStream,'ImageField', s3_url, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
 
     with open(temp.name, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
-    if default_storage.exists(s3_name):
-        default_storage.delete(s3_name)
-    default_storage.save(s3_name, f)
-    return temp.name
+    default_storage.save(s3_url ,f)
+    return s3_url, temp.name
 
-def store_permanently(image):
+def upload_as_error(image):
     unique_filename = str(uuid.uuid4())
-    save_image(image, os.path.join('errors',unique_filename+'.jpg'))
+    default_storage.save( os.path.join('errors',unique_filename+'.jpg'),image)
 
+
+def temp_to_s3_name(temp_url):
+    return temp_url.replace('/tmp/tmp','') + '.jpg'
 # https://piexif.readthedocs.io/en/latest/sample.html
 def rotate_with_exif_and_save(img_url):
     try:
@@ -101,11 +111,10 @@ def rotate_with_exif_and_save(img_url):
                 img = img.rotate(90, expand=True).transpose(Image.FLIP_LEFT_RIGHT)
             elif orientation == 8:
                 img = img.rotate(90, expand=True)
-
     return save_image(img)
 
 def rotate_and_save(temp_url,d):
     img = Image.open(temp_url)
     img = img.rotate(d, expand=True)
-    temp_url = save_image(img)
-    return temp_url
+    s3_url, temp_url = save_image(img)
+    return s3_url, temp_url

@@ -74,9 +74,9 @@
           </div>
         {% endif %}
         <div>
-        {% if temp_url %}
+        {% if s3_url %}
         <div>
-          <img src="{% static 'media/pic.jpg' %}" class="w3-border"  style = "padding:4px;width:100%;margin-top: 15px;" >
+          <img src="{% get_static_prefix %}media/{{s3_url}}" class="w3-border"  style = "padding:4px;width:100%;margin-top: 15px;" >
         </div>
         {% endif %}
         </div>

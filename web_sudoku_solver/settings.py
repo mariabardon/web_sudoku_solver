@@ -107,40 +107,40 @@ TEMPLATES = [
 ]
 
 
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static','media')
-MEDIA_URL = 'static/media/'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [
-    STATIC_DIR,
-]
-django_heroku.settings(locals())
+# SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+#
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'static','media')
+# MEDIA_URL = 'static/media/'
+#
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_URL = '/static/'
+# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     STATIC_DIR,
+# ]
+# django_heroku.settings(locals())
 
 
 #https://www.ordinarycoders.com/blog/article/serve-django-static-and-media-files-in-production
 
-#
-# AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-# AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
-# SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
-# AWS_STORAGE_BUCKET_NAME = 'web-sudoku-static'
-# AWS_S3_CUSTOM_DOMAIN = 'd22ohld22p4dfg.cloudfront.net'
-#
-# AWS_LOCATION = 'static'
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-#
-# STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
-#
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-# ]
-#
-# DEFAULT_FILE_STORAGE = 'web_sudoku_solver.storage_backends.MediaStorage'
-#
-#
-# #https://github.com/heroku/django-heroku/issues/25
-# django_heroku.settings(locals(), staticfiles=False)
+
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+AWS_STORAGE_BUCKET_NAME = 'web-sudoku-static'
+AWS_S3_CUSTOM_DOMAIN = 'd22ohld22p4dfg.cloudfront.net'
+
+AWS_LOCATION = 'static'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+DEFAULT_FILE_STORAGE = 'web_sudoku_solver.storage_backends.MediaStorage'
+
+
+#https://github.com/heroku/django-heroku/issues/25
+django_heroku.settings(locals(), staticfiles=False)
