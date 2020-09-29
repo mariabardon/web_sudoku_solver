@@ -104,7 +104,6 @@ def scan_image(img):
         sudoku_numbers[i][j] = str(predicted[0])
         # cv.imshow(str((i,j)) + ' ' + str(predicted),digit)
         # cv.waitKey(0)
-    cv.destroyAllWindows()
     return sudoku_numbers, new_perspective
 
 
