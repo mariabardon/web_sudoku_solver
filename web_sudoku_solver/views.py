@@ -15,11 +15,12 @@ def index(request):
             temp_url = request.POST['solve']
             numpy_image = cv.imread(temp_url)
             try:
-                original_numbers = mySudokuSolver.scan_image(numpy_image)
+                original_numbers, numpy_cropped= mySudokuSolver.scan_image(numpy_image)
                 solution = mySudokuSolver.solve_sudoku(original_numbers)
+                s3_url, temp_url = save_image(Image.fromarray(numpy_cropped))
             except Exception as e:
                 response['error'] = e
-                upload_as_error(Image.open(temp_url))
+                save_image(Image.open(temp_url),error=True)
                 return render(request,'web-sudoku-solver.html',response)
 
             z = zip(np.transpose(solution),np.transpose(original_numbers))
@@ -47,7 +48,7 @@ def index(request):
 
             except Exception as e:
                 response['error'] = e
-                upload_as_error(origin_url)
+                save_image(Image.open(origin_url),error=True)
                 return render(request,'web-sudoku-solver.html',response)
             response['temp_url'] =  temp_url
             response['s3_url'] = s3_url
@@ -56,7 +57,7 @@ def index(request):
     else:
         return render(request,'web-sudoku-solver.html')
 
-def save_image(image):
+def save_image(image, error=False):
     outputIoStream = BytesIO()
     outputIoStream.seek(0)
     w,h = image.size
@@ -69,7 +70,9 @@ def save_image(image):
     # unique_filename = str(uuid.uuid4())
     # s3_url = os.path.join('uploads',unique_filename+'.jpg')
     s3_url = temp_to_s3_name(temp.name)
-    f = InMemoryUploadedFile(outputIoStream,'ImageField', s3_url, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
+    if error: s3_url = os.path.join('errors',s3_url)
+
+    f = InMemoryUploadedFile(outputIoStream,'ImageField', 'image', 'image/jpeg',  sys.getsizeof(outputIoStream), None)
 
     with open(temp.name, 'wb+') as destination:
         for chunk in f.chunks():
@@ -79,8 +82,17 @@ def save_image(image):
     return s3_url, temp.name
 
 def upload_as_error(image):
+    outputIoStream = BytesIO()
+    outputIoStream.seek(0)
+    w,h = image.size
+    image = image.resize((500,500*h//w))
+    try:
+        image.save(outputIoStream , format='JPEG')
+    except:
+        image.save(outputIoStream , format='PNG')
     unique_filename = str(uuid.uuid4())
-    default_storage.save( os.path.join('errors',unique_filename+'.jpg'),image)
+    f = InMemoryUploadedFile(outputIoStream,'ImageField', s3_url, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
+    default_storage.save(os.path.join('errors',unique_filename+'.jpg'),f)
 
 
 def temp_to_s3_name(temp_url):
