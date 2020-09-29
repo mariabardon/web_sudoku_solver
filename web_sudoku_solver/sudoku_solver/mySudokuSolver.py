@@ -2,7 +2,6 @@ from .digit_predictor import Predictor as predictor
 from .solver_files import ASP_interface
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
 import sys
 def pad_and_resize(digit,imsize):
     (w,h) = digit.shape
