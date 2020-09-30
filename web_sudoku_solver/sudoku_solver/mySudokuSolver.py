@@ -2,18 +2,13 @@ from .digit_predictor import Predictor as predictor
 from .solver_files import ASP_interface
 import cv2 as cv
 import numpy as np
-import sys
+import sys, timeit
+
 def pad_and_resize(digit,imsize):
-    (w,h) = digit.shape
-    w = int(h*2/3)
-    digit = cv.resize(digit,(w,h))
-    top_bottom_pad = h//7
-    new_h = h + 2 * top_bottom_pad
-    left_pad = (new_h-w)//2
-    right_pad = new_h-(w+left_pad)
-    digit = cv.copyMakeBorder(digit, top_bottom_pad , top_bottom_pad , left_pad, right_pad,\
+    s = imsize//9
+    digit = cv.resize(digit, (5*s,7*s))
+    digit = cv.copyMakeBorder(digit, s, imsize-8*s, 2*s, imsize-7*s,\
                               borderType = cv.BORDER_CONSTANT, value=[0,0,0] )
-    digit = cv.resize(digit,(imsize,imsize))
     return digit
 
 def scaleImg(img,dim):
@@ -42,8 +37,7 @@ def scan_image(img):
     edited_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     edited_img = cv.GaussianBlur(edited_img, (9,9), 0)
     edited_img = cv.adaptiveThreshold(edited_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
-    p = 4
-    edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel=np.ones((p,p),np.uint8))
+    edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel=np.ones((4,4),np.uint8))
     my_contours, _ = cv.findContours(edited_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[-2:]
 
     largest_area = max([cv.contourArea(c) for c in my_contours])
@@ -96,13 +90,12 @@ def scan_image(img):
     sudoku_numbers = np.zeros((9,9), dtype=int)
     for cnt in my_contours:
         [x,y,w,h] = cv.boundingRect(cnt)
-        ctr = [x+w//2,y+h//2]
-        (i,j) = find_cell(rows, columns ,ctr)
+        i, j = (x+w//2)//100 , (y+h//2)//100
         digit = final_thresh[y:y+h,x:x+w]
         digit = pad_and_resize(digit,predictor.getIMSIZE())
         predicted = predictor.predict([digit])
         sudoku_numbers[i][j] = str(predicted[0])
-        # cv.imshow(str((i,j)) + ' ' + str(predicted),digit)
+        # cv.imshow(str((i,j)) + ' ' + str((x+w//2,y+h//2)),digit)
         # cv.waitKey(0)
     return sudoku_numbers, new_perspective
 
@@ -116,21 +109,17 @@ def solve_sudoku(sudoku_numbers):
                 asp_lines.append('value(cell({},{}),{}).'.format(i+1,j+1,int(sudoku_numbers[i][j])))
     solution_matrix = np.zeros((9,9), dtype=int)
     solution_matrix[sudoku_numbers!=0] = sudoku_numbers[sudoku_numbers!=0]
-
     print('solving it')
     try:
         solution = ASP_interface.solve(asp_lines)
     except RuntimeError as err:
         raise RuntimeError('Oops... Unable to find all digits in this sudoku. It may be rotated or unfocused. Please try again.')
-
     if solution == ['']:
         raise Exception('Oops... I cannot see well the sudoku grid in the image')
-
     for e in solution:
         #i and j go from 0 to 8, but answer goes from 1 to 9
         [i,j,digit] = np.add( [int(c) for c in e if c.isdigit()] , [-1,-1,0] )
         solution_matrix[i][j]=digit
-
     return solution_matrix, sudoku_numbers
 
 def guess_digits_contours(new_perspective, min_height, max_height, min_area, max_area, reverse=False):
@@ -142,8 +131,9 @@ def guess_digits_contours(new_perspective, min_height, max_height, min_area, max
     if reverse: edited_img = 255 - edited_img
     edited_img = cv.adaptiveThreshold(edited_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
     my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    my_contours = [c for c in my_contours if min_area < cv.contourArea(c) < max_area]
-    my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height]
+    # my_contours = [c for c in my_contours if min_area < cv.contourArea(c) < max_area]
+    # my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height]
+    my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height and min_area < cv.contourArea(c) < max_area]
     # i=drawAndShow(new_perspective,my_contours,i)
 
     ## with remaining contours, we assume that most common height bin of the heights histogram
@@ -164,8 +154,9 @@ def guess_digits_contours(new_perspective, min_height, max_height, min_area, max
 
     ## filter out the contours that are not in the new height range
     ## filter the contours that have shape that is too wide or too narrow for its height
-    my_contours = [c for c in my_contours if final_min_height < cv.boundingRect(c)[-1] < final_max_height+1]
-    my_contours = [c for c in my_contours if 5>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9]
+    # my_contours = [c for c in my_contours if final_min_height < cv.boundingRect(c)[-1] < final_max_height+1]
+    # my_contours = [c for c in my_contours if 5>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9]
+    my_contours = [c for c in my_contours if final_min_height < cv.boundingRect(c)[-1] < final_max_height+1 and 5>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9]
 
     # i=drawAndShow(new_perspective,my_contours,i)
     return edited_img,my_contours
