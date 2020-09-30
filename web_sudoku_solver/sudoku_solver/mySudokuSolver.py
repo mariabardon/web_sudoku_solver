@@ -83,8 +83,7 @@ def scan_image(img):
     cells = list(set([find_cell(rows,columns,c) for c in centers]))
     if(len(centers)>len(cells) or len(cells)<17): #if not many contours have been found try with inverse image
         final_thresh, my_contours = guess_digits_contours(new_perspective, min_height, max_height, min_area, max_area, reverse=True)
-    # cv.imshow('final threshold',final_thresh)
-    # cv.waitKey(0)
+
 
     predictor.load_model()
     sudoku_numbers = np.zeros((9,9), dtype=int)
@@ -123,7 +122,7 @@ def solve_sudoku(sudoku_numbers):
     return solution_matrix, sudoku_numbers
 
 def guess_digits_contours(new_perspective, min_height, max_height, min_area, max_area, reverse=False):
-    ## i=0
+    i=0
     ## create threshold image and remove too large or too small contours
     edited_img = cv.fastNlMeansDenoisingColored(new_perspective,None,10,10,7,21)
     edited_img = cv.cvtColor(edited_img, cv.COLOR_BGR2GRAY)
@@ -131,8 +130,6 @@ def guess_digits_contours(new_perspective, min_height, max_height, min_area, max
     if reverse: edited_img = 255 - edited_img
     edited_img = cv.adaptiveThreshold(edited_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
     my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    # my_contours = [c for c in my_contours if min_area < cv.contourArea(c) < max_area]
-    # my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height]
     my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height and min_area < cv.contourArea(c) < max_area]
     # i=drawAndShow(new_perspective,my_contours,i)
 
@@ -144,18 +141,18 @@ def guess_digits_contours(new_perspective, min_height, max_height, min_area, max
 
     ## knowing the most common height range we calculate the
     ## the variable d, used to close the thresholded image.
-    d = int(bin_edges[largest_bin+1]/10)
+    d = int(bin_edges[largest_bin+1]/7)
     final_min_height, final_max_height = int(bin_edges[largest_bin])-2*d, int(bin_edges[largest_bin+1])+2*d
 
     ## close the shapes in the threshold image using d as a kernel and find new contours
     edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
     my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    ## i=drawAndShow(new_perspective,my_contours,i)
+
+    # i=drawAndShow(edited_img,[],i)
+    # i=drawAndShow(new_perspective,my_contours,i)
 
     ## filter out the contours that are not in the new height range
-    ## filter the contours that have shape that is too wide or too narrow for its height
-    # my_contours = [c for c in my_contours if final_min_height < cv.boundingRect(c)[-1] < final_max_height+1]
-    # my_contours = [c for c in my_contours if 5>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9]
+    ## and the contours that have shape that is too wide or too narrow for its height
     my_contours = [c for c in my_contours if final_min_height < cv.boundingRect(c)[-1] < final_max_height+1 and 5>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9]
 
     # i=drawAndShow(new_perspective,my_contours,i)
