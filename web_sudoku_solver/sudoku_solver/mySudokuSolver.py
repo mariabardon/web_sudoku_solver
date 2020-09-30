@@ -27,8 +27,8 @@ def find_cell(x_array, y_array ,c):
     return (i,j)
 
 def scan_image(img):
-    min_area, max_area = 150, 2700
-    min_height, max_height = 30, 91
+    min_area, max_area = 150, 3000
+    min_height, max_height = 30, 85
 
     grid_width = 900
     grid_height = 900
@@ -134,6 +134,8 @@ def solve_sudoku(sudoku_numbers):
     return solution_matrix, sudoku_numbers
 
 def guess_digits_contours(new_perspective, min_height, max_height, min_area, max_area, reverse=False):
+    ## i=0
+    ## create threshold image and remove too large or too small contours
     edited_img = cv.fastNlMeansDenoisingColored(new_perspective,None,10,10,7,21)
     edited_img = cv.cvtColor(edited_img, cv.COLOR_BGR2GRAY)
     edited_img = cv.GaussianBlur(edited_img, (11,11), 0).astype('uint8')
@@ -142,21 +144,36 @@ def guess_digits_contours(new_perspective, min_height, max_height, min_area, max
     my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
     my_contours = [c for c in my_contours if min_area < cv.contourArea(c) < max_area]
     my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height]
+    # i=drawAndShow(new_perspective,my_contours,i)
+
+    ## with remaining contours, we assume that most common height bin of the heights histogram
+    ## will represent the aprox height of our digits, since all digits will have very simmilar height
     heights = [cv.boundingRect(c)[-1]  for c in my_contours]
     hist, bin_edges = np.histogram(heights,bins=100)
     largest_bin = np.argmax(hist)
+
+    ## knowing the most common height range we calculate the
+    ## the variable d, used to close the thresholded image.
     d = int(bin_edges[largest_bin+1]/10)
+    final_min_height, final_max_height = int(bin_edges[largest_bin])-2*d, int(bin_edges[largest_bin+1])+2*d
+
+    ## close the shapes in the threshold image using d as a kernel and find new contours
     edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
     my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-    my_contours = [c for c in my_contours if min_area < cv.contourArea(c) < max_area]
-    my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height]
-    # cv.imshow('final edited_img',edited_img)
-    # cv.waitKey(0)
-    final_heights = [cv.boundingRect(c)[-1]  for c in my_contours]
-    hist, bin_edges = np.histogram(final_heights,bins=100)
-    largest_bin = np.argmax(hist)
-    final_min_height, final_max_height = int(bin_edges[largest_bin])-d, int(bin_edges[largest_bin+1])+d
-    my_contours = [c for c in my_contours if cv.boundingRect(c)[-1] in list(range(final_min_height, final_max_height+1))]
+    ## i=drawAndShow(new_perspective,my_contours,i)
+
+    ## filter out the contours that are not in the new height range
+    ## filter the contours that have shape that is too wide or too narrow for its height
+    my_contours = [c for c in my_contours if final_min_height < cv.boundingRect(c)[-1] < final_max_height+1]
     my_contours = [c for c in my_contours if 5>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9]
 
+    # i=drawAndShow(new_perspective,my_contours,i)
     return edited_img,my_contours
+
+## This method is build for the purpose of debugging and finding errors.
+def drawAndShow(image,contours,count):
+    img = image.copy()
+    cv.drawContours(img, contours, -1, (0,255,0), 3)
+    cv.imshow(str(count),img)
+    cv.waitKey(0)
+    return count + 1
