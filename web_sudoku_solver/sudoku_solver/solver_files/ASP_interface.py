@@ -15,14 +15,16 @@ def solve(aspLines):
     os.chmod(sparcPath, st.st_mode | stat.S_IEXEC)
 
     pipe = subprocess.Popen(['java','-jar', sparcPath, mySolverPath, '-A'], stdout=subprocess.PIPE)
-    try:
-        wait_timeout(pipe, 5)
-    except RuntimeError as e:
-        raise e
+    try: wait_timeout(pipe, 2)
+    except RuntimeError as e: raise e
 
     answerSet = pipe.stdout.read().decode('utf-8')
+
     sys.stdout.write('answerSet')
     sys.stdout.write(answerSet)
+    try: subprocess.check_output('killall clingo', shell=True)
+    except subprocess.CalledProcessError: sys.stdout.write('Clingo is not running')
+
     chosenAnswer = answerSet.strip().split('\n\n')[0]
     entries = chosenAnswer.strip('{}').split(', ')
     return entries
