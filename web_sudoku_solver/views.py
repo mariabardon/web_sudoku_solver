@@ -26,7 +26,7 @@ def index(request):
             response['temp_url'] =  temp_url
             response['original_numbers'] = np.dstack((np.transpose(solution),np.transpose(original_numbers)))
             response['solution'] =  solution
-            response['s3_url'] = s3_url = temp_to_s3_name(temp_url)
+            response['s3_url'] = temp_to_s3_name(temp_url)
 
         elif 'right' in request.POST:
             temp_url = request.POST['right']
@@ -69,9 +69,6 @@ def save_image(image, error=False):
     # unique_filename = str(uuid.uuid4())
     # s3_url = os.path.join('uploads',unique_filename+'.jpg')
     s3_url = temp_to_s3_name(temp.name)
-    if error: s3_url = os.path.join('errors',s3_url)
-    else: s3_url = os.path.join('uploads',s3_url)
-
     f = InMemoryUploadedFile(outputIoStream,'ImageField', 'image', 'image/jpeg',  sys.getsizeof(outputIoStream), None)
 
     with open(temp.name, 'wb+') as destination:
@@ -81,22 +78,12 @@ def save_image(image, error=False):
     default_storage.save(s3_url ,f)
     return s3_url, temp.name
 
-def upload_as_error(image):
-    outputIoStream = BytesIO()
-    outputIoStream.seek(0)
-    w,h = image.size
-    image = image.resize((500,500*h//w))
-    try:
-        image.save(outputIoStream , format='JPEG')
-    except:
-        image.save(outputIoStream , format='PNG')
-    unique_filename = str(uuid.uuid4())
-    f = InMemoryUploadedFile(outputIoStream,'ImageField', s3_url, 'image/jpeg',  sys.getsizeof(outputIoStream), None)
-    default_storage.save(os.path.join('errors',unique_filename+'.jpg'),f)
 
-
-def temp_to_s3_name(temp_url):
-    return temp_url.replace('/tmp/tmp','') + '.jpg'
+def temp_to_s3_name(temp_url, error = False):
+    s3_url = temp_url.replace('/tmp/tmp','') + '.jpg'
+    if error: s3_url = os.path.join('errors',s3_url)
+    else: s3_url = os.path.join('uploads',s3_url)
+    return s3_url
 # https://piexif.readthedocs.io/en/latest/sample.html
 def rotate_with_exif_and_save(img_url):
     try:
