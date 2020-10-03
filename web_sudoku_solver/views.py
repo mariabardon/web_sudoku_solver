@@ -15,8 +15,7 @@ def index(request):
             temp_url = request.POST['solve']
             numpy_image = cv.imread(temp_url)
             try:
-                original_numbers, numpy_cropped= mySudokuSolver.scan_image(numpy_image)
-                solution = mySudokuSolver.solve_sudoku(original_numbers)
+                solution, original_numbers, numpy_cropped= mySudokuSolver.scan_image(numpy_image)
                 s3_url, temp_url = save_image(Image.fromarray(numpy_cropped))
             except Exception as e:
                 response['error'] = e
