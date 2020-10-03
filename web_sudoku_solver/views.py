@@ -70,6 +70,7 @@ def save_image(image, error=False):
     # s3_url = os.path.join('uploads',unique_filename+'.jpg')
     s3_url = temp_to_s3_name(temp.name)
     if error: s3_url = os.path.join('errors',s3_url)
+    else: s3_url = os.path.join('uploads',s3_url)
 
     f = InMemoryUploadedFile(outputIoStream,'ImageField', 'image', 'image/jpeg',  sys.getsizeof(outputIoStream), None)
 
