@@ -4,6 +4,9 @@ import cv2 as cv
 import numpy as np
 import sys, timeit
 
+global count
+
+count = 0
 showImages = False
 showAllDigits = False
 def pad_and_resize(digit,imsize):
@@ -24,7 +27,6 @@ def find_cell(x_array, y_array ,c):
     return (i,j)
 
 def scan_image(img):
-    i = 0 ## variable used for debugging purpose only
     min_area, max_area = 150, 3000
     min_height, max_height = 30, 85
 
@@ -38,19 +40,43 @@ def scan_image(img):
     dim = (1000*s[1]//s[0],1000)
     img = scaleImg(img,dim)
     edited_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    edited_img = cv.GaussianBlur(edited_img, (9,9), 0)
-    edited_img = cv.adaptiveThreshold(edited_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
-    edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel=np.ones((4,4),np.uint8))
-    my_contours, _ = cv.findContours(edited_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[-2:]
+    gauss = cv.GaussianBlur(edited_img, (9,9), 0)
+    edited_img = cv.adaptiveThreshold(gauss, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
+    drawContoursAndShow(edited_img,[])
 
+
+    d=4
+    edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
+
+    # d = 4
+    # vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, (1,d))
+    # edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, vertical_kernel, iterations=1)
+    # horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, (d,1))
+    # edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, horizontal_kernel, iterations=1)
+    # drawContoursAndShow(edited_img,[])
+
+
+    my_contours, _ = cv.findContours(edited_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[-2:]
     largest_area = max([cv.contourArea(c) for c in my_contours])
     sudoku_grid_contour = [c for c in my_contours if cv.contourArea(c) == largest_area][0]
+    # drawContoursAndShow(img,sudoku_grid_contour)
 
-    i=drawAndShow(img,my_contours,i)
-    i=drawAndShow(img,sudoku_grid_contour,i)
 
-    vertices = cv.approxPolyDP(sudoku_grid_contour,0.01*cv.arcLength(sudoku_grid_contour,True),True)
+    vertices = cv.approxPolyDP(sudoku_grid_contour,0.08*cv.arcLength(sudoku_grid_contour,True),True)
+    # drawContoursAndShow(img,vertices)
     vertices=np.squeeze(vertices)
+
+    a = 9
+    while len(vertices) <4:
+        a = a * 2 + 1
+        edited_img = cv.adaptiveThreshold(gauss, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, a, 2)
+        my_contours, _ = cv.findContours(edited_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[-2:]
+        largest_area = max([cv.contourArea(c) for c in my_contours])
+        sudoku_grid_contour = [c for c in my_contours if cv.contourArea(c) == largest_area][0]
+        vertices = cv.approxPolyDP(sudoku_grid_contour,0.08*cv.arcLength(sudoku_grid_contour,True),True)
+        # drawContoursAndShow(img,my_contours)
+        # drawContoursAndShow(img,vertices)
+        vertices = np.squeeze(vertices)
 
     ################# identifying_corners
     top_left_index = np.argmax([-sum(c) for c in vertices])
@@ -87,17 +113,28 @@ def scan_image(img):
     final_thresh, my_contours, final_max_height  = guess_digits_contours(new_perspective, min_height, max_height, min_area, max_area)
     centers = [[cv.boundingRect(cnt)[0]+cv.boundingRect(cnt)[-2]//2,cv.boundingRect(cnt)[1]+cv.boundingRect(cnt)[-1]//2] for cnt in my_contours]
     cells = list(set([find_cell(rows,columns,c) for c in centers]))
+    drawContoursAndShow(final_thresh,[])
+
     if(len(centers)>len(cells) or len(cells)<17): #if not many contours have been found try with inverse image
+        # print([find_cell(rows,columns,c) for c in centers])
+        # sys.stdout.flush()
         new_perspective = 255-new_perspective
         final_thresh, my_contours, final_max_height = guess_digits_contours(new_perspective, min_height, max_height, min_area, max_area)
 
 
-    final_thresh = cv.fastNlMeansDenoisingColored(new_perspective,None,10,10,7,21)
-    final_thresh = cv.cvtColor(final_thresh, cv.COLOR_BGR2GRAY)
-    final_thresh = cv.GaussianBlur(final_thresh, (11,11), 0).astype('uint8')
-    final_thresh = cv.adaptiveThreshold(final_thresh, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 9, 2)
-    d = int(final_max_height/7.5)
+
+
+    # final_thresh = cv.fastNlMeansDenoisingColored(new_perspective,None,10,10,7,21)
+    # final_thresh = cv.cvtColor(final_thresh, cv.COLOR_BGR2GRAY)
+    # final_thresh = cv.GaussianBlur(final_thresh, (11,11), 0).astype('uint8')
+    # final_thresh = cv.adaptiveThreshold(final_thresh, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 29, 2)
+    # drawContoursAndShow(final_thresh,[])
+
+    # d = int(final_max_height/6)
+    # drawContoursAndShow(edited_img,[])
+    # kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(d,d))
     # final_thresh = cv.morphologyEx(final_thresh, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
+
 
     predictor.load_model()
     sudoku_numbers = np.zeros((9,9), dtype=int)
@@ -105,17 +142,18 @@ def scan_image(img):
         [x,y,w,h] = cv.boundingRect(cnt)
         i, j = (x+w//2)//100 , (y+h//2)//100
         digit = final_thresh[y:y+h,x:x+w]
-        digit = cv.morphologyEx(digit, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
+        # digit = cv.morphologyEx(digit, cv.MORPH_CLOSE, kernel)
         digit = pad_and_resize(digit,predictor.getIMSIZE())
         predicted = predictor.predict([digit])
         sudoku_numbers[i][j] = str(predicted[0])
         if showAllDigits:
             cv.imshow(str(predicted)+' '+str((i+1,j+1)),digit)
             cv.waitKey(0)
-
-
-    return sudoku_numbers, new_perspective
-
+    try:
+        solution = solve_sudoku(sudoku_numbers)
+    except Exception as e:
+        raise e
+    return solution, sudoku_numbers, new_perspective
 
 def solve_sudoku(sudoku_numbers):
     asp_lines = []
@@ -140,16 +178,15 @@ def solve_sudoku(sudoku_numbers):
     return solution_matrix, sudoku_numbers
 
 def guess_digits_contours(new_perspective, min_height, max_height, min_area, max_area, reverse=False):
-    i=0
     ## create threshold image and remove too large or too small contours
     edited_img = cv.fastNlMeansDenoisingColored(new_perspective,None,10,10,7,21)
     edited_img = cv.cvtColor(edited_img, cv.COLOR_BGR2GRAY)
     edited_img = cv.GaussianBlur(edited_img, (11,11), 0).astype('uint8')
     if reverse: edited_img = 255 - edited_img
-    edited_img = cv.adaptiveThreshold(edited_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
+    edited_img = cv.adaptiveThreshold(edited_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 13, 2)
     my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
     my_contours = [c for c in my_contours if min_height < cv.boundingRect(c)[-1] < max_height and min_area < cv.contourArea(c) < max_area]
-    i=drawAndShow(new_perspective,my_contours,i)
+    # drawContoursAndShow(new_perspective,my_contours)
 
     ## with remaining contours, we assume that most common height bin of the heights histogram
     ## will represent the aprox height of our digits, since all digits will have very simmilar height
@@ -160,27 +197,33 @@ def guess_digits_contours(new_perspective, min_height, max_height, min_area, max
 
     ## knowing the most common height range we calculate the
     ## the variable d, used to close the thresholded image.
-    d = final_max_height//7
+
+    d = final_max_height//8
+    kernel=np.ones((d,d),np.uint8)
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(d,d))
+    drawContoursAndShow(edited_img,[])
+    edited_img = cv.morphologyEx(edited_img,cv.MORPH_CLOSE,kernel)
+    drawContoursAndShow(edited_img,[])
 
     ## close the shapes in the threshold image using d as a kernel and find new contours
-    edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel=np.ones((d,d),np.uint8))
-    my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
-
-    i=drawAndShow(edited_img,[],i)
-    i=drawAndShow(new_perspective,my_contours,i)
-
     ## filter out the contours that are not in the new height range
     ## and the contours that have shape that is too wide or too narrow for its height
-    my_contours = [c for c in my_contours if final_max_height-2*d < cv.boundingRect(c)[-1] < final_max_height+2*d and 5>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9]
+    # edited_img = cv.morphologyEx(edited_img, cv.MORPH_CLOSE, kernel)
+    my_contours, _ = cv.findContours(edited_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)[-2:]
+    my_contours = [c for c in my_contours if final_max_height-2*d < cv.boundingRect(c)[-1] < final_max_height+2*d \
+                                                and 4>cv.boundingRect(c)[-1]/cv.boundingRect(c)[-2]>0.9 \
+                                                and min_area < cv.contourArea(c)]
 
-    i=drawAndShow(new_perspective,my_contours,i)
+    # drawContoursAndShow(edited_img,[])
+    drawContoursAndShow(new_perspective,my_contours)
     return edited_img,my_contours, final_max_height
 
 ## This method is build for the purpose of debugging and finding errors.
-def drawAndShow(image,contours,count):
-    if showImages == False: return 0
+def drawContoursAndShow(image,contours):
+    global count
+    if showImages == False: return
     img = image.copy()
-    cv.drawContours(img, contours, -1, (0,255,0), 3)
+    cv.drawContours(img, contours, -1, (0,255,0), 2)
     cv.imshow(str(count),img)
     cv.waitKey(0)
-    return count + 1
+    count += 1
