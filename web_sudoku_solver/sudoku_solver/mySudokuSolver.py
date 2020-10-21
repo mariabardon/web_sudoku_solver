@@ -199,7 +199,7 @@ def guess_digits_contours(new_perspective, min_height, max_height, min_area, max
     ## the variable d, used to close the thresholded image.
 
     d = final_max_height//8
-    kernel=np.ones((d,d),np.uint8)
+    # kernel=np.ones((d,d),np.uint8)
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(d,d))
     drawContoursAndShow(edited_img,[])
     edited_img = cv.morphologyEx(edited_img,cv.MORPH_CLOSE,kernel)
